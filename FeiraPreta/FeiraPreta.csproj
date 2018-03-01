@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Features\EventScore\" />
+    <Folder Include="Features\Highlight\" />
+    <Folder Include="Features\Person\" />
+    <Folder Include="Features\Publication\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
