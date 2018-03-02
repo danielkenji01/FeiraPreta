@@ -13,7 +13,7 @@ namespace FeiraPreta.Domain
 
         public string FullNameInstagram { get; set; }
 
-        public Byte[] ProfilePictureInstagram { get; set; }
+        public string ProfilePictureInstagram { get; set; }
 
         public DateTime CreatedDate { get; set; }
 
