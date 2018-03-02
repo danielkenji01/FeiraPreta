@@ -11,12 +11,9 @@ namespace FeiraPreta.Infrastructure
     {
         public Db(DbContextOptions<Db> options) : base (options)
         {
-
         }
 
         public DbSet<EventScore> EventScore { get; set; }
-
-        public DbSet<Highlight> Highlight { get; set; }
 
         public DbSet<Person> Person { get; set; }
 
@@ -25,9 +22,15 @@ namespace FeiraPreta.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<EventScore>().ToTable("EventScore");
-            modelBuilder.Entity<Highlight>().ToTable("Highlight");
             modelBuilder.Entity<Person>().ToTable("Person");
             modelBuilder.Entity<Publication>().ToTable("Publication");
+
+            modelBuilder.Entity<Person>().HasMany(p => p.Publications).WithOne(p => p.Person).HasForeignKey(p => p.PersonId);
+            modelBuilder.Entity<Person>().Property(p => p.CreatedDate).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Person>().Property(p => p.UpdatedDate).ValueGeneratedOnAddOrUpdate();
+
+            modelBuilder.Entity<Publication>().Property(p => p.CreatedDate).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Publication>().Property(p => p.UpdatedDate).ValueGeneratedOnAddOrUpdate();
 
             base.OnModelCreating(modelBuilder);
         }
