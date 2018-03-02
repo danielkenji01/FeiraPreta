@@ -13,17 +13,21 @@ namespace FeiraPreta.Domain
 
         public string Link { get; set; }
 
+        public string Subtitle { get; set; }
+
         public DateTime CreatedDateInstagram { get; set; }
 
-        public Byte[] ImageLowResolution { get; set; }
+        public string ImageLowResolution { get; set; }
 
-        public Byte[] ImageThumbnail { get; set; }
+        public string ImageThumbnail { get; set; }
 
-        public Byte[] ImageStandardResolution { get; set; }
+        public string ImageStandardResolution { get; set; }
 
         public DateTime CreatedDate { get; set; }
 
         public DateTime UpdatedDate { get; set; }
+
+        public bool IsHighlight { get; set; }
 
         #region Navigation
 
