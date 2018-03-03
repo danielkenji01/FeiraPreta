@@ -31,6 +31,19 @@ namespace FeiraPreta.Features.Publication
             public bool IsHighlight { get; set; }
 
             public string Subtitle { get; set; }
+
+            public string Link { get; set; }
+
+            public PersonResult Person { get; set; }
+
+            public class PersonResult
+            {
+                public Guid Id { get; set; }
+
+                public string UsernameInstagram { get; set; }
+
+                public string FullNameInstagram { get; set; }
+            }
         }
 
         public class QueryHandler : IAsyncRequestHandler<Query, IList<Result>>
@@ -53,7 +66,14 @@ namespace FeiraPreta.Features.Publication
                                    ImageStandardResolution = p.ImageStandardResolution,
                                    ImageThumbnail = p.ImageThumbnail,
                                    IsHighlight = p.IsHighlight,
-                                   Subtitle = p.Subtitle
+                                   Subtitle = p.Subtitle,
+                                   Link = p.Link,
+                                   Person = new Result.PersonResult
+                                   {
+                                       Id = p.Person.Id,
+                                       FullNameInstagram = p.Person.FullNameInstagram,
+                                       UsernameInstagram = p.Person.UsernameInstagram
+                                   }
                                }).ToListAsync();
             }
         }
