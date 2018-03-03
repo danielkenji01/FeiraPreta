@@ -30,9 +30,7 @@ namespace FeiraPreta.Features.Publication
         [HttpGet]
         public async Task<IList<List.Result>> List()
         {
-            var result = await mediator.Send(new List.Query());
-
-            return result;
+            return await mediator.Send(new List.Query());
         }
     }
 }

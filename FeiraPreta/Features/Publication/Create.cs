@@ -39,8 +39,6 @@ namespace FeiraPreta.Features.Publication
 
                 using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
                 {
-                    // var publication = JsonConvert.ToString();
-
                     var json = JObject.Parse(await sr.ReadToEndAsync());
 
                     publication.ImageLowResolution = json["data"]["images"]["low_resolution"]["url"].ToString();
