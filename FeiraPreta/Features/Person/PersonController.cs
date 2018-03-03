@@ -18,5 +18,13 @@ namespace FeiraPreta.Features.Person
         {
             this.mediator = mediator;
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] Create.Command command)
+        {
+            await mediator.Send(command);
+
+            return Ok();
+        }
     }
 }
