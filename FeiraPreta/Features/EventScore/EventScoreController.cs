@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 namespace FeiraPreta.Features.EventScore
 {
     [Route("api/[controller]")]
+    [EnableCors("MyPolicy")]
     public class EventScoreController : Controller
     {
         private IMediator mediator;
