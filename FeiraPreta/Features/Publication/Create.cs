@@ -41,15 +41,18 @@ namespace FeiraPreta.Features.Publication
                 {
                     var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                    publication.ImageLowResolution = json["data"]["images"]["low_resolution"]["url"].ToString();
-                    publication.ImageStandardResolution = json["data"]["images"]["standard_resolution"]["url"].ToString();
-                    publication.ImageThumbnail = json["data"]["images"]["thumbnail"]["url"].ToString();
-                    publication.PersonId = new Guid("3783B665-C040-40ED-89FB-FD0B83810201");
-                    publication.CreatedDate = DateTime.Now;
-                    publication.IsHighlight = true;
-                    publication.CreatedDateInstagram = DateTime.Now;
-                    publication.Subtitle = json["data"]["caption"]["text"].ToString();
-                    publication.Link = message.Link;
+                    publication = new Domain.Publication
+                    {
+                        ImageLowResolution = json["data"]["images"]["low_resolution"]["url"].ToString(),
+                        ImageStandardResolution = json["data"]["images"]["standard_resolution"]["url"].ToString(),
+                        ImageThumbnail = json["data"]["images"]["thumbnail"]["url"].ToString(),
+                        PersonId = new Guid("3783B665-C040-40ED-89FB-FD0B83810201"),
+                        CreatedDate = DateTime.Now,
+                        IsHighlight = true,
+                        CreatedDateInstagram = DateTime.Now,
+                        Subtitle = json["data"]["caption"]["text"].ToString(),
+                        Link = message.Link
+                    };
 
                     db.Publication.Add(publication);
                 };
