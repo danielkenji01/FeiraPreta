@@ -31,7 +31,7 @@ namespace FeiraPreta.Features.Person
 
                 WebResponse response = processWebRequest(url);
 
-                Domain.Person person;
+                Domain.Person person = new Domain.Person();
 
                 using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
                 {
@@ -39,9 +39,9 @@ namespace FeiraPreta.Features.Person
 
                     person = new Domain.Person
                     {
-                        ProfilePictureInstagram = json["data"]["profile_picture"].ToString(),
-                        FullNameInstagram = json["data"]["full_name"].ToString(),
-                        UsernameInstagram = json["data"]["username"].ToString(),
+                        ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString(),
+                        FullNameInstagram = json["data"][0]["full_name"].ToString(),
+                        UsernameInstagram = json["data"][0]["username"].ToString(),
                         CreatedDate = DateTime.Now
                     };
 
