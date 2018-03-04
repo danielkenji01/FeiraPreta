@@ -30,12 +30,12 @@ namespace FeiraPreta.Features.Publication
 
             public async Task Handle(Command message)
             {
-                var list = db.Publication.ToList();
+                //var list = db.Publication.ToList();
 
-                foreach (var l in list)
-                {
-                    if (l.Link == message.Link) throw new ConflictException();
-                }
+                //foreach (var l in list)
+                //{
+                //    if (l.Link == message.Link) throw new ConflictException();
+                //}
 
                 string shortcode = message.Link.Substring(28, 11);
 
