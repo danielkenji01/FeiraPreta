@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SPlay.Infraestructure
+namespace FeiraPreta.Infraestructure
 {
     public class HttpException : Exception
     {

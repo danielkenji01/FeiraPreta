@@ -3,7 +3,7 @@ using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-using SPlay.Infraestructure;
+using FeiraPreta.Infraestructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +30,13 @@ namespace FeiraPreta.Features.Publication
 
             public async Task Handle(Command message)
             {
+                var list = db.Publication.ToList();
+
+                foreach (var l in list)
+                {
+                    if (l.Link == message.Link) throw new ConflictException();
+                }
+
                 string shortcode = message.Link.Substring(28, 11);
 
                 string url = "https://api.instagram.com/v1/media/shortcode/" + shortcode + "?access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
@@ -37,13 +44,6 @@ namespace FeiraPreta.Features.Publication
                 WebResponse response = processWebRequest(url);
 
                 Domain.Publication publication = new Domain.Publication();
-
-                var list = db.Publication.ToList();
-
-                foreach (var l in list)
-                {
-                    if (l.Link == message.Link) throw new ConflictException();
-                }
 
                 using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
                 {

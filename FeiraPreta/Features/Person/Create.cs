@@ -1,6 +1,7 @@
 ﻿using FeiraPreta.Infrastructure;
 using MediatR;
 using Newtonsoft.Json.Linq;
+using FeiraPreta.Infraestructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,13 @@ namespace FeiraPreta.Features.Person
 
             public async Task Handle(Command message)
             {
+                var list = db.Person.ToList();
+
+                foreach (var item in list)
+                {
+                    if (item.UsernameInstagram == message.Username) throw new ConflictException();
+                }
+
                 string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
                 WebResponse response = processWebRequest(url);
