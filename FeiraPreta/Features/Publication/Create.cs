@@ -3,6 +3,7 @@ using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using SPlay.Infraestructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,13 @@ namespace FeiraPreta.Features.Publication
                 WebResponse response = processWebRequest(url);
 
                 Domain.Publication publication = new Domain.Publication();
+
+                var list = db.Publication.ToList();
+
+                foreach (var l in list)
+                {
+                    if (l.Link == message.Link) throw new ConflictException();
+                }
 
                 using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
                 {
