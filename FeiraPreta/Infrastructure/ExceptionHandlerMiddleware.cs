@@ -1,9 +1,6 @@
 ﻿using FeiraPreta.Infraestructure;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,6 +26,11 @@ namespace FeiraPreta.Infrastructure
                 context.Response.StatusCode = e.StatusCode;
                 if (e.Body != null)
                 {
+                    // Gambiarra pra retornar o body de erro
+                    byte[] byteArray = Encoding.UTF8.GetBytes(e.Body);
+
+                    await context.Response.Body.WriteAsync(byteArray, 0, byteArray.Length);
+                    await context.Response.Body.FlushAsync();
                 }
             }
         }

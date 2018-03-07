@@ -32,7 +32,7 @@ namespace FeiraPreta.Infraestructure
 
     public class BadRequestException : HttpException
     {
-        public BadRequestException() : base(400)
+        public BadRequestException() : base(400, "O empreendedor não está cadastrado!!!")
         {
             
         }
