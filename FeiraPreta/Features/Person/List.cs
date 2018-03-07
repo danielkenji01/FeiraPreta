@@ -42,7 +42,7 @@ namespace FeiraPreta.Features.Person
 
             public async Task<IList<Result>> Handle(Query message)
             {
-                return await db.Person.Select(p => new Result
+                return await db.Person.Where(p => !p.DeletedDate.HasValue).Select(p => new Result
                 {
                     Id = p.Id,
                     CreatedDate = p.CreatedDate,
