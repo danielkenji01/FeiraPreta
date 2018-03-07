@@ -27,11 +27,15 @@ namespace FeiraPreta.Domain
 
         public DateTime? UpdatedDate { get; set; }
 
+        public DateTime? DeletedDate { get; set; }
+
         public bool IsHighlight { get; set; }
 
         #region Navigation
 
         public Person Person { get; set; }
+
+        public ICollection<Domain.Publication_Tag> Publication_Tags { get; set; }
 
         #endregion
     }
