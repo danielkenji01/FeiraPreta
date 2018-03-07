@@ -30,6 +30,14 @@ namespace FeiraPreta.Infraestructure
         }
     }
 
+    public class BadRequestException : HttpException
+    {
+        public BadRequestException() : base(400)
+        {
+            
+        }
+    }
+
     /// <summary>
     /// 409 status code, resource already exists
     /// </summary>

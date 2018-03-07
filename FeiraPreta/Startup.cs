@@ -34,7 +34,15 @@ namespace FeiraPreta
 
             services.AddDbContext<Db>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddMvc();
+            services.AddMvc(opt =>
+            {
+                opt.Filters.Add(typeof(ValidationActionFilter));
+            })
+                    .AddFeatureFolders()
+                    .AddJsonOptions(options =>
+                    {
+                        options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                    });
 
             services.AddMediatR(typeof(Startup));
 
@@ -49,6 +57,8 @@ namespace FeiraPreta
             }
 
             app.UseCors("MyPolicy");
+
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
 
             app.UseMvc();
 
