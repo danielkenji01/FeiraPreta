@@ -32,5 +32,14 @@ namespace FeiraPreta.Features.Publication
         {
             return await mediator.Send(new List.Query());
         }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> Delete(Delete.Command command)
+        {
+            await mediator.Send(command);
+
+            return Ok();
+        }
     }
 }

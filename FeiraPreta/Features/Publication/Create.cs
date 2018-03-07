@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace FeiraPreta.Features.Publication
 {
@@ -22,20 +23,17 @@ namespace FeiraPreta.Features.Publication
         public class CommandHandler : IAsyncRequestHandler<Command>
         {
             private readonly Db db;
+            private readonly IMediator mediator;
 
-            public CommandHandler(Db db)
+            public CommandHandler(Db db, IMediator mediator)
             {
                 this.db = db;
+                this.mediator = mediator;
             }
 
             public async Task Handle(Command message)
             {
-                //var list = db.Publication.ToList();
-
-                //foreach (var l in list)
-                //{
-                //    if (l.Link == message.Link) throw new ConflictException();
-                //}
+                if (await db.Publication.SingleOrDefaultAsync(p => p.Link == message.Link) != null) throw new ConflictException();
 
                 string shortcode = message.Link.Substring(28, 11);
 
@@ -49,18 +47,35 @@ namespace FeiraPreta.Features.Publication
                 {
                     var json = JObject.Parse(await sr.ReadToEndAsync());
 
+                    var person = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"]["user"]["username"].ToString());
+
+                    if (person == null) throw new HttpException(400);
+
                     publication = new Domain.Publication
                     {
                         ImageLowResolution = json["data"]["images"]["low_resolution"]["url"].ToString(),
                         ImageStandardResolution = json["data"]["images"]["standard_resolution"]["url"].ToString(),
                         ImageThumbnail = json["data"]["images"]["thumbnail"]["url"].ToString(),
-                        PersonId = new Guid("3783B665-C040-40ED-89FB-FD0B83810201"),
+                        PersonId = person.Id,
                         CreatedDate = DateTime.Now,
                         IsHighlight = true,
                         CreatedDateInstagram = DateTime.Now,
                         Subtitle = json["data"]["caption"]["text"].ToString(),
                         Link = message.Link
                     };
+
+                    var tags = json["data"]["tags"];
+
+                    //foreach (var t in tags)
+                    //{
+                    //    var command = new Tag.Create.Command
+                    //    {
+                    //        Nome = t.,
+                    //        PublicationId = publication.Id
+                    //    };
+
+                    //    await mediator.Send(command);
+                    //}
 
                     db.Publication.Add(publication);
                 };

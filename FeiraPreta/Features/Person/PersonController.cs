@@ -26,5 +26,20 @@ namespace FeiraPreta.Features.Person
 
             return Ok();
         }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> Delete(Delete.Command command)
+        {
+            await mediator.Send(command);
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IList<List.Result>> List()
+        {
+            return await mediator.Send(new List.Query());
+        }
     }
 }
