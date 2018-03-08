@@ -15,6 +15,8 @@ namespace FeiraPreta.Features.Person
         public class Command : IRequest
         {
             public string Username { get; set; }
+
+            public string PhoneNumber { get; set; }
         }
 
         public class CommandHandler : IAsyncRequestHandler<Command>
@@ -50,7 +52,8 @@ namespace FeiraPreta.Features.Person
                         ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString(),
                         FullNameInstagram = json["data"][0]["full_name"].ToString(),
                         UsernameInstagram = json["data"][0]["username"].ToString(),
-                        CreatedDate = DateTime.Now
+                        CreatedDate = DateTime.Now,
+                        PhoneNumber = message.PhoneNumber
                     };
 
                     db.Person.Add(person);
