@@ -21,6 +21,8 @@ namespace FeiraPreta.Domain
 
         public DateTime? DeletedDate { get; set; }
 
+        public string PhoneNumber { get; set; }
+
         #region Navigation
 
         public ICollection<Publication> Publications { get; set; }
