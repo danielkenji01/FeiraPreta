@@ -49,7 +49,7 @@ namespace FeiraPreta.Features.Publication
 
                     var person = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"]["user"]["username"].ToString());
 
-                    if (person == null) throw new HttpException(400);
+                    if (person == null) throw new BadRequestException();
 
                     publication = new Domain.Publication
                     {
@@ -64,20 +64,21 @@ namespace FeiraPreta.Features.Publication
                         Link = message.Link
                     };
 
+                    db.Publication.Add(publication);
+
                     var tags = json["data"]["tags"];
 
-                    //foreach (var t in tags)
-                    //{
-                    //    var command = new Tag.Create.Command
-                    //    {
-                    //        Nome = t.,
-                    //        PublicationId = publication.Id
-                    //    };
+                    foreach (var t in tags)
+                    {
+                        var command = new Tag.Create.Command
+                        {
+                            Nome = t.ToString(),
+                            PublicationId = publication.Id
+                        };
 
-                    //    await mediator.Send(command);
-                    //}
+                        await mediator.Send(command);
+                    }
 
-                    db.Publication.Add(publication);
                 };
 
                 await db.SaveChangesAsync();
