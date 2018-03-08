@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace FeiraPreta.Features.Person
 {
@@ -30,12 +31,9 @@ namespace FeiraPreta.Features.Person
 
             public async Task Handle(Command message)
             {
-                var list = db.Person.ToList();
+                var test = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == message.Username || "@" + p.UsernameInstagram == message.Username);
 
-                foreach (var item in list)
-                {
-                    if (item.UsernameInstagram == message.Username) throw new ConflictException();
-                }
+                if (test != null) throw new HttpException(409, "Empreendedor já existente!!");
 
                 string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
