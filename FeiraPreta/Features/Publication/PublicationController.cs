@@ -41,5 +41,19 @@ namespace FeiraPreta.Features.Publication
 
             return Ok();
         }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<Read.Result> Read(Read.Query query)
+        {
+            return await mediator.Send(query);
+        }
+
+        [HttpGet]
+        [Route("search/{search}")]
+        public async Task<IList<ListByTag.Result>> ListByTag(string search)
+        {
+            return await mediator.Send(new ListByTag.Query(search));
+        }
     }
 }
