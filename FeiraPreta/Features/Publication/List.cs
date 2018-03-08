@@ -58,7 +58,8 @@ namespace FeiraPreta.Features.Publication
             public async Task<IList<Result>> Handle(Query message)
             {
                 return await db.Publication
-                               .Where(p => p.IsHighlight || !p.DeletedDate.HasValue)
+                               .Include(p => p.Person)
+                               .Where(p => p.IsHighlight || !p.DeletedDate.HasValue || !p.Person.DeletedDate.HasValue)
                                .Select(p => new Result
                                {
                                    Id = p.Id,
