@@ -28,7 +28,7 @@ namespace FeiraPreta.Features.Publication
         }
 
         [HttpGet]
-        public async Task<List.Result> List()
+        public async Task<IList<List.Result>> List()
         {
             return await mediator.Send(new List.Query());
         }
@@ -51,7 +51,7 @@ namespace FeiraPreta.Features.Publication
 
         [HttpGet]
         [Route("search/{search}")]
-        public async Task<ListByTag.Result> ListByTag(string search)
+        public async Task<IList<ListByTag.Result>> ListByTag(string search)
         {
             return await mediator.Send(new ListByTag.Query(search));
         }

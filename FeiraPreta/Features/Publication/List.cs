@@ -10,7 +10,7 @@ namespace FeiraPreta.Features.Publication
 {
     public class List
     {
-        public class Query : IRequest<Result>
+        public class Query : IRequest<IList<Result>>
         {
             public Query()
             {
@@ -20,38 +20,35 @@ namespace FeiraPreta.Features.Publication
 
         public class Result
         {
-            public Publication[] Publications { get; set; }
 
-            public class Publication
+            public Guid Id { get; set; }
+
+            public string ImageLowResolution { get; set; }
+
+            public string ImageThumbnail { get; set; }
+
+            public string ImageStandardResolution { get; set; }
+
+            public bool IsHighlight { get; set; }
+
+            public string Subtitle { get; set; }
+
+            public string Link { get; set; }
+
+            public PersonResult Person { get; set; }
+
+            public class PersonResult
             {
                 public Guid Id { get; set; }
 
-                public string ImageLowResolution { get; set; }
+                public string UsernameInstagram { get; set; }
 
-                public string ImageThumbnail { get; set; }
-
-                public string ImageStandardResolution { get; set; }
-
-                public bool IsHighlight { get; set; }
-
-                public string Subtitle { get; set; }
-
-                public string Link { get; set; }
-
-                public PersonResult Person { get; set; }
-
-                public class PersonResult
-                {
-                    public Guid Id { get; set; }
-
-                    public string UsernameInstagram { get; set; }
-
-                    public string FullNameInstagram { get; set; }
-                }
+                public string FullNameInstagram { get; set; }
             }
+
         }
 
-        public class QueryHandler : IAsyncRequestHandler<Query, Result>
+        public class QueryHandler : IAsyncRequestHandler<Query, IList<Result>>
         {
             private readonly Db db;
 
@@ -60,12 +57,12 @@ namespace FeiraPreta.Features.Publication
                 this.db = db;
             }
 
-            public async Task<Result> Handle(Query message)
+            public async Task<IList<Result>> Handle(Query message)
             {
-                var publications = await db.Publication
+                return await db.Publication
                                .Include(p => p.Person)
                                .Where(p => p.IsHighlight || !p.DeletedDate.HasValue || !p.Person.DeletedDate.HasValue)
-                               .Select(p => new Result.Publication
+                               .Select(p => new Result
                                {
                                    Id = p.Id,
                                    ImageLowResolution = p.ImageLowResolution,
@@ -74,18 +71,13 @@ namespace FeiraPreta.Features.Publication
                                    IsHighlight = p.IsHighlight,
                                    Subtitle = p.Subtitle,
                                    Link = p.Link,
-                                   Person = new Result.Publication.PersonResult
+                                   Person = new Result.PersonResult
                                    {
                                        Id = p.Person.Id,
                                        FullNameInstagram = p.Person.FullNameInstagram,
                                        UsernameInstagram = p.Person.UsernameInstagram
                                    }
                                }).ToListAsync();
-
-                return new Result
-                {
-                    Publications = publications.ToArray()
-                };
             }
         }
     }
