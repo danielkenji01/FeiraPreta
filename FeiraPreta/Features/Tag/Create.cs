@@ -47,8 +47,6 @@ namespace FeiraPreta.Features.Tag
                 };
 
                 db.Publication_Tag.Add(publication_tag);
-
-                await db.SaveChangesAsync();
             }
         }
     }
