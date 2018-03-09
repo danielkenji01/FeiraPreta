@@ -10,7 +10,7 @@ namespace FeiraPreta.Features.Publication
 {
     public class ListByTag
     {
-        public class Query : IRequest<IList<Result>>
+        public class Query : IRequest<Result>
         {
             public string Tag { get; set; }
 
@@ -27,43 +27,49 @@ namespace FeiraPreta.Features.Publication
 
         public class Result
         {
-            public Guid Id { get; set; }
+            public Publication[] Publications { get; set; }
 
-            public string Link { get; set; }
-
-            public string Subtitle { get; set; }
-
-            public DateTime CreatedDateInstagram { get; set; }
-
-            public string ImageLowResolution { get; set; }
-
-            public string ImageThumbnail { get; set; }
-
-            public string ImageStandardResolution { get; set; }
-
-            public DateTime CreatedDate { get; set; }
-
-            public bool IsHighlight { get; set; }
-
-            public Person PersonResult { get; set; }
-
-            public class Person
+            public class Publication
             {
+
                 public Guid Id { get; set; }
 
-                public string UsernameInstagram { get; set; }
+                public string Link { get; set; }
 
-                public string FullNameInstagram { get; set; }
+                public string Subtitle { get; set; }
 
-                public string ProfilePictureInstagram { get; set; }
+                public DateTime CreatedDateInstagram { get; set; }
+
+                public string ImageLowResolution { get; set; }
+
+                public string ImageThumbnail { get; set; }
+
+                public string ImageStandardResolution { get; set; }
 
                 public DateTime CreatedDate { get; set; }
 
-                public string PhoneNumber { get; set; }
+                public bool IsHighlight { get; set; }
+
+                public Person PersonResult { get; set; }
+
+                public class Person
+                {
+                    public Guid Id { get; set; }
+
+                    public string UsernameInstagram { get; set; }
+
+                    public string FullNameInstagram { get; set; }
+
+                    public string ProfilePictureInstagram { get; set; }
+
+                    public DateTime CreatedDate { get; set; }
+
+                    public string PhoneNumber { get; set; }
+                }
             }
         }
 
-        public class QueryHandler : IAsyncRequestHandler<Query, IList<Result>>
+        public class QueryHandler : IAsyncRequestHandler<Query, Result>
         {
             private readonly Db db;
 
@@ -72,14 +78,14 @@ namespace FeiraPreta.Features.Publication
                 this.db = db;
             }
 
-            public async Task<IList<Result>> Handle(Query message)
+            public async Task<Result> Handle(Query message)
             {
                 var publication = await db.Publication
                     .Include(p => p.Person)
                     .Include(p => p.Publication_Tags)
                     .ThenInclude(pt => pt.Tag)
                     .Where(p => !p.DeletedDate.HasValue || !p.Person.DeletedDate.HasValue)
-                    .SelectMany(p => p.Publication_Tags.Where(pt => pt.Tag.Nome == message.Tag).Select(pub => new Result
+                    .SelectMany(p => p.Publication_Tags.Where(pt => pt.Tag.Nome == message.Tag).Select(pub => new Result.Publication
                     {
                         Id = pub.Publication.Id,
                         CreatedDate = pub.Publication.CreatedDate,
@@ -90,7 +96,7 @@ namespace FeiraPreta.Features.Publication
                         IsHighlight = pub.Publication.IsHighlight,
                         Link = pub.Publication.Link,
                         Subtitle = pub.Publication.Subtitle,
-                        PersonResult = new Result.Person
+                        PersonResult = new Result.Publication.Person
                         {
                             Id = pub.Publication.Person.Id,
                             CreatedDate = pub.Publication.Person.CreatedDate,
@@ -101,7 +107,10 @@ namespace FeiraPreta.Features.Publication
                         }
                     })).ToListAsync();
 
-                return publication;
+                return new Result
+                {
+                    Publications = publication.ToArray()
+                };
             }
         }
     }
