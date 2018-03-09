@@ -31,9 +31,9 @@ namespace FeiraPreta.Features.Person
 
             public async Task Handle(Command message)
             {
-                var test = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == message.Username || "@" + p.UsernameInstagram == message.Username);
+                //var test = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == message.Username || "@" + p.UsernameInstagram == message.Username);
 
-                if (test != null) throw new HttpException(409, "Empreendedor já existente!!");
+                //if (test != null) throw new HttpException(409, "Empreendedor já existente!!");
 
                 string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
@@ -44,6 +44,10 @@ namespace FeiraPreta.Features.Person
                 using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
                 {
                     var json = JObject.Parse(await sr.ReadToEndAsync());
+
+                    if (json["data"].Count() == 0) throw new NotFoundException();
+
+                    if (await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"][0]["username"].ToString()) != null) throw new ConflictException();
 
                     person = new Domain.Person
                     {
