@@ -31,9 +31,9 @@ namespace FeiraPreta.Features.Person
 
             public async Task Handle(Command message)
             {
-                //var test = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == message.Username || "@" + p.UsernameInstagram == message.Username);
+                if (message.Username == null || message.Username.Trim() == "") throw new HttpException(400, "Username não pode ser vazio");
 
-                //if (test != null) throw new HttpException(409, "Empreendedor já existente!!");
+                if (message.PhoneNumber == null || message.PhoneNumber.Trim() == "") throw new HttpException(400, "Telefone não pode ser vazio");
 
                 string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
@@ -47,7 +47,7 @@ namespace FeiraPreta.Features.Person
 
                     if (json["data"].Count() == 0) throw new NotFoundException();
 
-                    if (await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"][0]["username"].ToString()) != null) throw new ConflictException();
+                    if (await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"][0]["username"].ToString()) != null) throw new HttpException(409, "Empreendedor já cadastrado!!!");
 
                     person = new Domain.Person
                     {
@@ -69,10 +69,18 @@ namespace FeiraPreta.Features.Person
                 WebRequest request;
                 WebResponse response;
 
-                request = WebRequest.Create(url);
-                response = request.GetResponse();
+                try
+                {
+                    request = WebRequest.Create(url);
 
-                return response;
+                    response = request.GetResponse();
+
+                    return response;
+                }
+                catch (Exception e)
+                {
+                    throw new HttpException(400, "Erro no servidor do Instagram!!");
+                }
             }
         }
     }
