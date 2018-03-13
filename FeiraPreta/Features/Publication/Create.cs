@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 
 namespace FeiraPreta.Features.Publication
 {
@@ -33,10 +34,10 @@ namespace FeiraPreta.Features.Publication
 
             public async Task Handle(Command message)
             {
+                if (message.Link == null || message.Link.Trim() == "") throw new HttpException(400, "Link não pode ser vazio");
+
                 if (await db.Publication.SingleOrDefaultAsync(p => p.Link == message.Link) != null) throw new ConflictException();
-
-                //string shortcode = message.Link.Substring(28, 11);
-
+                
                 int firstIndex = message.Link.IndexOf("p/");
                 int lastIndex = message.Link.LastIndexOf("?");
 
@@ -52,9 +53,11 @@ namespace FeiraPreta.Features.Publication
                 {
                     var json = JObject.Parse(await sr.ReadToEndAsync());
 
+                    if (json["data"] == null) throw new HttpException(404, "Link inválido!!");
+
                     var person = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"]["user"]["username"].ToString());
 
-                    if (person == null) throw new BadRequestException();
+                    if (person == null) throw new HttpException(400, "O empreendedor não está cadastrado!!!");
 
                     publication = new Domain.Publication
                     {
@@ -94,10 +97,17 @@ namespace FeiraPreta.Features.Publication
                 WebRequest request;
                 WebResponse response;
 
-                request = WebRequest.Create(url);
-                response = request.GetResponse();
+                try
+                {
+                    request = WebRequest.Create(url);
 
-                return response;
+                    response = request.GetResponse();
+
+                    return response;
+                } catch (Exception e)
+                {
+                    throw new HttpException(400, "Erro no servidor do Instagram!!");
+                }
             }
         }
     }
