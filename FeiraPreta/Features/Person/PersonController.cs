@@ -14,6 +14,8 @@ namespace FeiraPreta.Features.Person
     {
         private IMediator mediator;
 
+        JsonResult jr;
+
         public PersonController(IMediator mediator)
         {
             this.mediator = mediator;
@@ -22,18 +24,44 @@ namespace FeiraPreta.Features.Person
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Create.Command command)
         {
-            await mediator.Send(command);
-
-            return Ok();
+            try
+            {
+                await mediator.Send(command);
+                jr = new JsonResult("Empreendedor cadastrado com sucesso");
+                jr.ContentType = "application/json";
+                jr.StatusCode = 200;
+                return Ok(Json(jr));
+            }
+            catch (System.Exception ex)
+            {
+                jr = new JsonResult("Ocorreu um erro");
+                jr.ContentType = "application/json";
+                jr.StatusCode = 400;
+                jr.Value = ex.Message;
+                return NotFound(Json(jr));
+            }
         }
 
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> Delete(Delete.Command command)
         {
-            await mediator.Send(command);
-
-            return Ok();
+            try
+            {
+                await mediator.Send(command);
+                jr = new JsonResult("Empreendedor excluido com sucesso");
+                jr.ContentType = "application/json";
+                jr.StatusCode = 200;
+                return Ok(Json(jr));
+            }
+            catch (System.Exception ex)
+            {
+                jr = new JsonResult("Ocorreu um erro");
+                jr.ContentType = "application/json";
+                jr.StatusCode = 400;
+                jr.Value = ex.Message;
+                return NotFound(Json(jr));
+            }
         }
 
         [HttpGet]

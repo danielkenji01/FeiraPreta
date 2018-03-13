@@ -13,6 +13,7 @@ namespace FeiraPreta.Features.Publication
     public class PublicationController : Controller
     {
         private IMediator mediator;
+        JsonResult jr;
 
         public PublicationController(IMediator mediator)
         {
@@ -22,9 +23,22 @@ namespace FeiraPreta.Features.Publication
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Create.Command command)
         {
-            await mediator.Send(command);
-
-            return Ok();
+            try
+            {
+                await mediator.Send(command);
+                jr = new JsonResult("Usuário criado com sucesso");
+                jr.StatusCode = 200;
+                jr.ContentType = "application/json";
+                return Ok(Json(jr));
+            }
+            catch (System.Exception ex)
+            {
+                jr = new JsonResult("Ocorreu um erro");
+                jr.StatusCode = 409;
+                jr.ContentType = "application/json";
+                jr.Value = ex.Message;
+                return BadRequest(Json(jr));
+            }
         }
 
         [HttpGet]
@@ -37,9 +51,22 @@ namespace FeiraPreta.Features.Publication
         [Route("{id}")]
         public async Task<IActionResult> Delete(Delete.Command command)
         {
-            await mediator.Send(command);
-
-            return Ok();
+            try
+            {
+                await mediator.Send(command);
+                jr = new JsonResult("Publicação excluida com sucesso");
+                jr.ContentType = "application/json";
+                jr.StatusCode = 200;
+                return Ok(Json(jr));
+            }
+            catch (System.Exception ex)
+            {
+                jr = new JsonResult("Ocorreu um erro");
+                jr.ContentType = "application/json";
+                jr.StatusCode = 400;
+                jr.Value = ex.Message;
+                return NotFound(Json(jr));
+            }
         }
 
         [HttpGet]
