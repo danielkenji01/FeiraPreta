@@ -13,14 +13,21 @@ namespace FeiraPreta.Features.Person
 {
     public class Create
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result>
         {
             public string Username { get; set; }
 
             public string PhoneNumber { get; set; }
         }
 
-        public class CommandHandler : IAsyncRequestHandler<Command>
+        public class Result
+        {
+            public int StatusCode { get; set; }
+
+            public string Message { get; set; }
+        }
+
+        public class CommandHandler : IAsyncRequestHandler<Command, Result>
         {
             private readonly Db db;
 
@@ -29,11 +36,11 @@ namespace FeiraPreta.Features.Person
                 this.db = db;
             }
 
-            public async Task Handle(Command message)
+            public async Task<Result> Handle(Command message)
             {
-                if (message.Username == null || message.Username.Trim() == "") throw new HttpException(400, "Username não pode ser vazio");
+                if (message.Username == null || message.Username.Trim() == "") return new Result { Message = "Username não pode ser nulo", StatusCode = 400 };
 
-                if (message.PhoneNumber == null || message.PhoneNumber.Trim() == "") throw new HttpException(400, "Telefone não pode ser vazio");
+                if (message.PhoneNumber == null || message.PhoneNumber.Trim() == "") return new Result { Message = "Telefone não pode ser nulo", StatusCode = 400 };
 
                 string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
@@ -47,7 +54,7 @@ namespace FeiraPreta.Features.Person
 
                     if (json["data"].Count() == 0) throw new NotFoundException();
 
-                    if (await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"][0]["username"].ToString()) != null) throw new HttpException(409, "Empreendedor já cadastrado!!!");
+                    if (await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"][0]["username"].ToString()) != null) return new Result { Message = "Empreendedor já existente", StatusCode = 409 };
 
                     person = new Domain.Person
                     {
@@ -62,6 +69,8 @@ namespace FeiraPreta.Features.Person
                 }
 
                 await db.SaveChangesAsync();
+
+                return new Result { Message = "Empreendedor cadastrado com sucesso!!", StatusCode = 201 };
             }
 
             private WebResponse processWebRequest(string url)

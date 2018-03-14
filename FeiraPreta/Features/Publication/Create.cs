@@ -16,12 +16,19 @@ namespace FeiraPreta.Features.Publication
 {
     public class Create
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result>
         {
             public string Link { get; set; }
         }
 
-        public class CommandHandler : IAsyncRequestHandler<Command>
+        public class Result
+        {
+            public int StatusCode { get; set; }
+
+            public string Message { get; set; }
+        }
+
+        public class CommandHandler : IAsyncRequestHandler<Command, Result>
         {
             private readonly Db db;
             private readonly IMediator mediator;
@@ -32,11 +39,11 @@ namespace FeiraPreta.Features.Publication
                 this.mediator = mediator;
             }
 
-            public async Task Handle(Command message)
+            public async Task<Result> Handle(Command message)
             {
-                if (message.Link == null || message.Link.Trim() == "") throw new HttpException(400, "Link não pode ser vazio");
+                if (message.Link == null || message.Link.Trim() == "") return new Result { Message = "Link não pode ser nulo", StatusCode = 400 };
 
-                if (await db.Publication.SingleOrDefaultAsync(p => p.Link == message.Link) != null) throw new ConflictException();
+                if (await db.Publication.SingleOrDefaultAsync(p => p.Link == message.Link) != null) return new Result { Message = "Link já existente", StatusCode = 409};
                 
                 int firstIndex = message.Link.IndexOf("p/");
                 int lastIndex = message.Link.LastIndexOf("?");
@@ -53,11 +60,11 @@ namespace FeiraPreta.Features.Publication
                 {
                     var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                    if (json["data"] == null) throw new HttpException(404, "Link inválido!!");
+                    if (json["data"] == null) return new Result { StatusCode = 404, Message = "Link inválido" };
 
                     var person = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"]["user"]["username"].ToString());
 
-                    if (person == null) throw new HttpException(400, "O empreendedor não está cadastrado!!!");
+                    if (person == null) return new Result { StatusCode = 400, Message = "O empreendedor não está cadastrado!!!" };
 
                     publication = new Domain.Publication
                     {
@@ -90,6 +97,8 @@ namespace FeiraPreta.Features.Publication
                 };
 
                 await db.SaveChangesAsync();
+
+                return new Result { Message = "Destaque cadastrado com sucesso!!", StatusCode = 201 };
             }
 
             private WebResponse processWebRequest(string url)

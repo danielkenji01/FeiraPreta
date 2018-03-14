@@ -21,24 +21,9 @@ namespace FeiraPreta.Features.Publication
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Create.Command command)
+        public async Task<Create.Result> Create([FromBody] Create.Command command)
         {
-            try
-            {
-                await mediator.Send(command);
-                jr = new JsonResult("Usuário criado com sucesso");
-                jr.StatusCode = 200;
-                jr.ContentType = "application/json";
-                return Ok(Json(jr));
-            }
-            catch (System.Exception ex)
-            {
-                jr = new JsonResult("Ocorreu um erro");
-                jr.StatusCode = 409;
-                jr.ContentType = "application/json";
-                jr.Value = ex.Message;
-                return BadRequest(Json(jr));
-            }
+            return await mediator.Send(command);
         }
 
         [HttpGet]
@@ -49,24 +34,9 @@ namespace FeiraPreta.Features.Publication
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> Delete(Delete.Command command)
+        public async Task<Delete.Result> Delete(Delete.Command command)
         {
-            try
-            {
-                await mediator.Send(command);
-                jr = new JsonResult("Publicação excluida com sucesso");
-                jr.ContentType = "application/json";
-                jr.StatusCode = 200;
-                return Ok(Json(jr));
-            }
-            catch (System.Exception ex)
-            {
-                jr = new JsonResult("Ocorreu um erro");
-                jr.ContentType = "application/json";
-                jr.StatusCode = 400;
-                jr.Value = ex.Message;
-                return NotFound(Json(jr));
-            }
+            return await mediator.Send(command);
         }
 
         [HttpGet]
