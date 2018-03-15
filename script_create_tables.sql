@@ -1,3 +1,6 @@
+CREATE DATABASE DB_A36660_FeiraPreta
+go;
+
 CREATE TABLE DB_A36660_FeiraPreta.dbo.EventScore (
 	id uniqueidentifier(36) NOT NULL,
 	value float NOT NULL,
