@@ -1,5 +1,4 @@
-﻿using FeiraPreta.Infrastructure;
-using MediatR;
+﻿using MediatR;
 using Newtonsoft.Json.Linq;
 using FeiraPreta.Infraestructure;
 using System;

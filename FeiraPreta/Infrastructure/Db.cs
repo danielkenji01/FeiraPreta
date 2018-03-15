@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FeiraPreta.Infrastructure
+namespace FeiraPreta.Infraestructure
 {
     public class Db : DbContext
     {
