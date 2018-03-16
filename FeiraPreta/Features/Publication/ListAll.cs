@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FeiraPreta.Features.Publication
 {
-    public class List
+    public class ListAll
     {
         public class Query : IRequest<IList<Result>>
         {
@@ -61,7 +61,7 @@ namespace FeiraPreta.Features.Publication
             {
                 return await db.Publication
                                .Include(p => p.Person)
-                               .Where(p => p.IsHighlight && (!p.DeletedDate.HasValue || !p.Person.DeletedDate.HasValue))
+                               .Where(p => !p.DeletedDate.HasValue || !p.Person.DeletedDate.HasValue)
                                .Select(p => new Result
                                {
                                    Id = p.Id,
