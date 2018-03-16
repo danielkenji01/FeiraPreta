@@ -23,6 +23,8 @@ namespace FeiraPreta.Domain
 
         public string PhoneNumber { get; set; }
 
+        public string IdInstagram { get; set; }
+
         #region Navigation
 
         public ICollection<Publication> Publications { get; set; }
