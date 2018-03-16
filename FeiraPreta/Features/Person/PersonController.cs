@@ -14,8 +14,6 @@ namespace FeiraPreta.Features.Person
     {
         private IMediator mediator;
 
-        JsonResult jr;
-
         public PersonController(IMediator mediator)
         {
             this.mediator = mediator;

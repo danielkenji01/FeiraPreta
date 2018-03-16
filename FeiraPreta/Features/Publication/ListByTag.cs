@@ -1,4 +1,4 @@
-﻿using FeiraPreta.Infrastructure;
+﻿using FeiraPreta.Infraestructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;

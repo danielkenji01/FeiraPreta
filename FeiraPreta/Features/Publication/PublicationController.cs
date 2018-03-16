@@ -13,7 +13,6 @@ namespace FeiraPreta.Features.Publication
     public class PublicationController : Controller
     {
         private IMediator mediator;
-        JsonResult jr;
 
         public PublicationController(IMediator mediator)
         {
@@ -26,10 +25,24 @@ namespace FeiraPreta.Features.Publication
             return await mediator.Send(command);
         }
 
+        [HttpPost]
+        [Route("highlight")]
+        public async Task<Highlight.Result> Highlight([FromBody] Highlight.Command command)
+        {
+            return await mediator.Send(command);
+        }
+
         [HttpGet]
         public async Task<IList<List.Result>> List()
         {
             return await mediator.Send(new List.Query());
+        }
+
+        [HttpGet]
+        [Route("all")]
+        public async Task<IList<ListAll.Result>> ListAll()
+        {
+            return await mediator.Send(new ListAll.Query());
         }
 
         [HttpDelete]
