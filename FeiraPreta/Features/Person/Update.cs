@@ -26,6 +26,12 @@ namespace FeiraPreta.Features.Person
             public int StatusCode { get; set; }
 
             public string Message { get; set; }
+
+            public Guid Id { get; set; }
+
+            public string Username { get; set; }
+
+            public string PhoneNumber { get; set; }
         }
 
         public class CommandHandler : IAsyncRequestHandler<Command, Result>
@@ -77,7 +83,7 @@ namespace FeiraPreta.Features.Person
                 }
                 await db.SaveChangesAsync();
 
-                return new Result { Message = "Empreendedor cadastrado com sucesso!!", StatusCode = 201 };
+                return new Result { Message = "Empreendedor cadastrado com sucesso!!", StatusCode = 201, Id = person.Id, PhoneNumber = message.PhoneNumber, Username = message.Username };
             }
 
             private WebResponse processWebRequest(string url)
