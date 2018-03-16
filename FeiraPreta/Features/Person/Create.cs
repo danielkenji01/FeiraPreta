@@ -41,6 +41,20 @@ namespace FeiraPreta.Features.Person
 
                 if (message.PhoneNumber == null || message.PhoneNumber.Trim() == "") return new Result { Message = "Telefone não pode ser nulo", StatusCode = 400 };
 
+                var exists = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == message.Username);
+
+                if (exists != null)
+                {
+                    if (exists.DeletedDate.HasValue)
+                    {
+                        exists.DeletedDate = null;
+
+                        return new Result { Message = "Empreendedor cadastrado com sucesso", StatusCode = 201 };
+                    }
+
+                    return new Result { Message = "Empreendedor já existente", StatusCode = 409 };
+                }
+
                 string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
                 WebResponse response = processWebRequest(url);
@@ -51,9 +65,7 @@ namespace FeiraPreta.Features.Person
                 {
                     var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                    if (json["data"].Count() == 0) throw new NotFoundException();
-
-                    if (await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"][0]["username"].ToString()) != null) return new Result { Message = "Empreendedor já existente", StatusCode = 409 };
+                    if (json["data"].Count() == 0) return new Result { StatusCode = 404, Message = "Perfil não encontrado"};
 
                     person = new Domain.Person
                     {
@@ -61,7 +73,8 @@ namespace FeiraPreta.Features.Person
                         FullNameInstagram = json["data"][0]["full_name"].ToString(),
                         UsernameInstagram = json["data"][0]["username"].ToString(),
                         CreatedDate = DateTime.Now,
-                        PhoneNumber = message.PhoneNumber
+                        PhoneNumber = message.PhoneNumber,
+                        IdInstagram = json["data"][0]["id"].ToString()
                     };
 
                     db.Person.Add(person);

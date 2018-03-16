@@ -1,16 +1,12 @@
-﻿using FeiraPreta.Infrastructure;
+﻿using FeiraPreta.Infraestructure;
 using MediatR;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using RestSharp;
-using FeiraPreta.Infraestructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using FluentValidation;
 
 namespace FeiraPreta.Features.Publication
 {
@@ -43,8 +39,20 @@ namespace FeiraPreta.Features.Publication
             {
                 if (message.Link == null || message.Link.Trim() == "") return new Result { Message = "Link não pode ser nulo", StatusCode = 400 };
 
-                if (await db.Publication.SingleOrDefaultAsync(p => p.Link == message.Link) != null) return new Result { Message = "Link já existente", StatusCode = 409};
-                
+                var exists = await db.Publication.SingleOrDefaultAsync(p => p.Link == message.Link);
+
+                if (exists != null)
+                {
+                    if (exists.DeletedDate.HasValue)
+                    {
+                        exists.DeletedDate = null;
+
+                        return new Result { Message = "Link cadastrado com sucesso!!", StatusCode = 201 };
+                    }
+
+                    return new Result { Message = "Link já existente", StatusCode = 409 };
+                }
+
                 int firstIndex = message.Link.IndexOf("p/");
                 int lastIndex = message.Link.LastIndexOf("?");
 
@@ -73,7 +81,7 @@ namespace FeiraPreta.Features.Publication
                         ImageThumbnail = json["data"]["images"]["thumbnail"]["url"].ToString(),
                         PersonId = person.Id,
                         CreatedDate = DateTime.Now,
-                        IsHighlight = true,
+                        IsHighlight = false,
                         CreatedDateInstagram = DateTime.Now,
                         Subtitle = json["data"]["caption"]["text"].ToString(),
                         Link = message.Link
@@ -98,7 +106,7 @@ namespace FeiraPreta.Features.Publication
 
                 await db.SaveChangesAsync();
 
-                return new Result { Message = "Destaque cadastrado com sucesso!!", StatusCode = 201 };
+                return new Result { Message = "Link cadastrado com sucesso!!", StatusCode = 201 };
             }
 
             private WebResponse processWebRequest(string url)
@@ -113,7 +121,8 @@ namespace FeiraPreta.Features.Publication
                     response = request.GetResponse();
 
                     return response;
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     throw new HttpException(400, "Erro no servidor do Instagram!!");
                 }
