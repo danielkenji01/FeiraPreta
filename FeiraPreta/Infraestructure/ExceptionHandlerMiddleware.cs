@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FeiraPreta.Infrastructure
+namespace FeiraPreta.Infraestructure
 {
     public class ExceptionHandlerMiddleware
     {
