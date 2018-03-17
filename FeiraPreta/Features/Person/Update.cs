@@ -42,14 +42,21 @@ namespace FeiraPreta.Features.Person
 
                 if (person == null || person.DeletedDate.HasValue) return new Result { Message = "Empreendedor não existente", StatusCode = 404};
 
-                person.UpdatedDate = DateTime.Now;
-                person.PhoneNumber = message.PhoneNumber;
-                person.UsernameInstagram = message.UserNameInstagram;
+                try
+                {
+                    person.UpdatedDate = DateTime.Now;
+                    person.PhoneNumber = message.PhoneNumber;
+                    person.UsernameInstagram = message.UserNameInstagram;
 
-                db.Person.Update(person);
-                await db.SaveChangesAsync();
+                    db.Person.Update(person);
+                    await db.SaveChangesAsync();
 
-                return new Result { StatusCode = 200, Message = "Empreendedor atualizado com sucesso!!" };
+                    return new Result { StatusCode = 200, Message = "Empreendedor atualizado com sucesso!!" };
+                }
+                catch (System.Exception)
+                {
+                    return new Result { StatusCode = 409, Message = "Usuário do instagram já existe!" };
+                }
             }
 
         }
