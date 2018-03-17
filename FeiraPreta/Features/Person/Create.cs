@@ -48,41 +48,46 @@ namespace FeiraPreta.Features.Person
                     if (exists.DeletedDate.HasValue)
                     {
                         exists.DeletedDate = null;
-
+                        db.Person.Update(exists);
+                        db.SaveChanges();
                         return new Result { Message = "Empreendedor cadastrado com sucesso", StatusCode = 201 };
                     }
 
                     return new Result { Message = "Empreendedor já existente", StatusCode = 409 };
-                }
-
-                string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
-
-                WebResponse response = processWebRequest(url);
-
-                Domain.Person person = new Domain.Person();
-
-                using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
+                } 
+                else 
                 {
-                    var json = JObject.Parse(await sr.ReadToEndAsync());
+                    string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
-                    if (json["data"].Count() == 0) return new Result { StatusCode = 404, Message = "Perfil não encontrado"};
+                    WebResponse response = processWebRequest(url);
 
-                    person = new Domain.Person
+                    Domain.Person person = new Domain.Person();
+
+                    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
                     {
-                        ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString(),
-                        FullNameInstagram = json["data"][0]["full_name"].ToString(),
-                        UsernameInstagram = json["data"][0]["username"].ToString(),
-                        CreatedDate = DateTime.Now,
-                        PhoneNumber = message.PhoneNumber,
-                        IdInstagram = json["data"][0]["id"].ToString()
-                    };
+                        var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                    db.Person.Add(person);
+                        if (json["data"].Count() == 0) return new Result { StatusCode = 404, Message = "Perfil não encontrado"};
+
+                        person = new Domain.Person
+                        {
+                            ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString(),
+                            FullNameInstagram = json["data"][0]["full_name"].ToString(),
+                            UsernameInstagram = json["data"][0]["username"].ToString(),
+                            CreatedDate = DateTime.Now,
+                            PhoneNumber = message.PhoneNumber,
+                            IdInstagram = json["data"][0]["id"].ToString()
+                        };
+
+                        db.Person.Add(person);
+                    }
+
+                    await db.SaveChangesAsync();
+
+                    return new Result { Message = "Empreendedor cadastrado com sucesso!!", StatusCode = 201 };
                 }
 
-                await db.SaveChangesAsync();
-
-                return new Result { Message = "Empreendedor cadastrado com sucesso!!", StatusCode = 201 };
+                
             }
 
             private WebResponse processWebRequest(string url)

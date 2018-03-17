@@ -37,7 +37,7 @@ namespace FeiraPreta.Features.Tag
                         Nome = message.Nome
                     };
                 }
-
+                
                 db.Tag.Add(tag);
 
                 var publication_tag = new Domain.Publication_Tag

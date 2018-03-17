@@ -28,6 +28,8 @@ namespace FeiraPreta.Features.Person
 
             public string ProfilePictureInstagram { get; set; }
 
+            public string PhoneNumber { get; set; }
+
             public DateTime CreatedDate { get; set; }
         }
 
@@ -48,7 +50,8 @@ namespace FeiraPreta.Features.Person
                     CreatedDate = p.CreatedDate,
                     FullNameInstagram = p.FullNameInstagram,
                     ProfilePictureInstagram = p.ProfilePictureInstagram,
-                    UsernameInstagram = p.UsernameInstagram
+                    UsernameInstagram = p.UsernameInstagram,
+                    PhoneNumber = p.PhoneNumber
                 }).ToListAsync();
             }
         }

@@ -32,6 +32,12 @@ namespace FeiraPreta.Features.Person
             return await mediator.Send(command);
         }
 
+        [HttpPut]
+        public async Task<Update.Result> Update([FromBody] Update.Command command)
+        {
+            return await mediator.Send(command);
+        }
+
         [HttpGet]
         public async Task<IList<List.Result>> List()
         {
