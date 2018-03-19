@@ -61,7 +61,9 @@ namespace FeiraPreta.Features.Publication
             {
                 return await db.Publication
                                .Include(p => p.Person)
-                               .Where(p => p.IsHighlight && (!p.DeletedDate.HasValue || !p.Person.DeletedDate.HasValue))
+                               .Where(p => p.IsHighlight)
+                               .Where(p => !p.DeletedDate.HasValue)
+                               .Where(p => !p.Person.DeletedDate.HasValue)
                                .Select(p => new Result
                                {
                                    Id = p.Id,
