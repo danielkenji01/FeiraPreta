@@ -50,7 +50,7 @@ namespace FeiraPreta.Features.Publication
                     {
                         exists.DeletedDate = null;
 
-                        return new Result { Message = "Destaque cadastrado com sucesso!!", StatusCode = 201 };
+                        return new Result { Message = "Destaque cadastrado com sucesso", StatusCode = 201 };
                     }
 
                     return new Result { Message = "Link já existente", StatusCode = 409 };
@@ -109,7 +109,7 @@ namespace FeiraPreta.Features.Publication
 
                 await db.SaveChangesAsync();
 
-                return new Result { Message = "Destaque cadastrado com sucesso!!", StatusCode = 201 };
+                return new Result { Message = "Destaque cadastrado com sucesso", StatusCode = 201 };
             }
 
             private WebResponse processWebRequest(string url)
@@ -127,7 +127,7 @@ namespace FeiraPreta.Features.Publication
                 }
                 catch (Exception e)
                 {
-                    throw new HttpException(400, "Erro no servidor do Instagram!!");
+                    throw new HttpException(400, "Erro no servidor do Instagram");
                 }
             }
         }

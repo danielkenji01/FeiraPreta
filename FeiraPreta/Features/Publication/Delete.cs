@@ -41,7 +41,7 @@ namespace FeiraPreta.Features.Publication
 
                 await db.SaveChangesAsync();
 
-                return new Result { StatusCode = 200, Message = "Publicação deletada com sucesso!!!!" };
+                return new Result { StatusCode = 200, Message = "Publicação deletada com sucesso" };
             }
         }
     }

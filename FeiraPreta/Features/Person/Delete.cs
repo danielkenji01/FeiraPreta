@@ -41,7 +41,7 @@ namespace FeiraPreta.Features.Person
 
                 await db.SaveChangesAsync();
 
-                return new Result { StatusCode = 200, Message = "Empreendedor deletado com sucesso!!" };
+                return new Result { StatusCode = 200, Message = "Empreendedor deletado com sucesso" };
             }
         }
     }

@@ -33,15 +33,18 @@ namespace FeiraPreta.Features.Person
         }
 
         [HttpPut]
-        public async Task<Update.Result> Update([FromBody] Update.Command command)
+        [Route("{id}")]
+        public async Task<Update.Result> Update(Guid id, [FromBody] Update.Command command)
         {
+            command.Id = id;
+
             return await mediator.Send(command);
         }
 
         [HttpGet]
-        public async Task<IList<List.Result>> List()
+        public async Task<IList<List.Result>> List(int page)
         {
-            return await mediator.Send(new List.Query());
+            return await mediator.Send(new List.Query(page));
         }
     }
 }

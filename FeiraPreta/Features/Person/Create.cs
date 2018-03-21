@@ -54,47 +54,40 @@ namespace FeiraPreta.Features.Person
                     }
 
                     return new Result { Message = "Empreendedor já existente", StatusCode = 409 };
-                } 
-                else 
+                }
+                else
                 {
-                    try
+                    string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
+
+                    WebResponse response = processWebRequest(url);
+
+                    Domain.Person person = new Domain.Person();
+
+                    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
                     {
-                        string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
+                        var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                        WebResponse response = processWebRequest(url);
+                        if (json["data"].Count() == 0) return new Result { StatusCode = 404, Message = "Perfil não encontrado" };
 
-                        Domain.Person person = new Domain.Person();
-
-                        using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
+                        person = new Domain.Person
                         {
-                            var json = JObject.Parse(await sr.ReadToEndAsync());
+                            ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString(),
+                            FullNameInstagram = json["data"][0]["full_name"].ToString(),
+                            UsernameInstagram = json["data"][0]["username"].ToString(),
+                            CreatedDate = DateTime.Now,
+                            PhoneNumber = message.PhoneNumber,
+                            IdInstagram = json["data"][0]["id"].ToString()
+                        };
 
-                            if (json["data"].Count() == 0) return new Result { StatusCode = 404, Message = "Perfil não encontrado"};
-
-                            person = new Domain.Person
-                            {
-                                ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString(),
-                                FullNameInstagram = json["data"][0]["full_name"].ToString(),
-                                UsernameInstagram = json["data"][0]["username"].ToString(),
-                                CreatedDate = DateTime.Now,
-                                PhoneNumber = message.PhoneNumber,
-                                IdInstagram = json["data"][0]["id"].ToString()
-                            };
-
-                            db.Person.Add(person);
-                        }
-
-                        await db.SaveChangesAsync();
-
-                        return new Result { Message = "Empreendedor cadastrado com sucesso!!", StatusCode = 201 };
+                        db.Person.Add(person);
                     }
-                    catch (System.Exception)
-                    {
-                        return new Result { Message = "Empreendedor já existe no banco de dados!", StatusCode = 409 };
-                    }
+
+                    await db.SaveChangesAsync();
+
+                    return new Result { Message = "Empreendedor cadastrado com sucesso", StatusCode = 201 };
                 }
 
-                
+
             }
 
             private WebResponse processWebRequest(string url)
@@ -112,7 +105,7 @@ namespace FeiraPreta.Features.Person
                 }
                 catch (Exception e)
                 {
-                    throw new HttpException(400, "Erro no servidor do Instagram!!");
+                    throw new HttpException(400, "Erro no servidor do Instagram");
                 }
             }
         }

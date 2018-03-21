@@ -1,4 +1,5 @@
 ﻿using FeiraPreta.Infraestructure;
+using FeiraPreta.Infraestructure.Query;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,11 +11,18 @@ namespace FeiraPreta.Features.Person
 {
     public class List
     {
-        public class Query : IRequest<IList<Result>>
+        public class Query : PageQuery<IList<Result>>
         {
+            public int Page { get; set; }
+
             public Query()
             {
 
+            }
+
+            public Query(int Page)
+            {
+                this.Page = Page;
             }
         }
 
@@ -44,15 +52,18 @@ namespace FeiraPreta.Features.Person
 
             public async Task<IList<Result>> Handle(Query message)
             {
-                return await db.Person.Where(p => !p.DeletedDate.HasValue).Select(p => new Result
-                {
-                    Id = p.Id,
-                    CreatedDate = p.CreatedDate,
-                    FullNameInstagram = p.FullNameInstagram,
-                    ProfilePictureInstagram = p.ProfilePictureInstagram,
-                    UsernameInstagram = p.UsernameInstagram,
-                    PhoneNumber = p.PhoneNumber
-                }).ToListAsync();
+                return await db.Person
+                               .Where(p => !p.DeletedDate.HasValue)
+                               .Paginate(message)
+                               .Select(p => new Result
+                               {
+                                   Id = p.Id,
+                                   CreatedDate = p.CreatedDate,
+                                   FullNameInstagram = p.FullNameInstagram,
+                                   ProfilePictureInstagram = p.ProfilePictureInstagram,
+                                   UsernameInstagram = p.UsernameInstagram,
+                                   PhoneNumber = p.PhoneNumber
+                               }).ToListAsync();
             }
         }
     }

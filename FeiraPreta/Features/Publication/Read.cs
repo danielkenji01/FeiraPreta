@@ -64,9 +64,12 @@ namespace FeiraPreta.Features.Publication
             {
                 if (message.Id == null || message.Id.ToString().Trim() == "") throw new HttpException(400, "Id não pode ser nulo!!");
 
-                var publication = await db.Publication.Include(p => p.Person).Where(p => !p.DeletedDate.HasValue || !p.Person.DeletedDate.HasValue).SingleOrDefaultAsync(p => p.Id == message.Id);
+                var publication = await db.Publication.Include(p => p.Person)
+                                                      .Where(p => !p.DeletedDate.HasValue) 
+                                                      .Where(p => !p.Person.DeletedDate.HasValue)
+                                                      .SingleOrDefaultAsync(p => p.Id == message.Id);
 
-                if (publication == null) throw new NotFoundException();
+                if (publication == null) throw new HttpException(404, "Publicação não encontrada!!");
 
                 return new Result
                 {
