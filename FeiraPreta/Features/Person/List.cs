@@ -1,5 +1,5 @@
 ﻿using FeiraPreta.Infraestructure;
-using FeiraPreta.Infraestructure.Query;
+// using FeiraPreta.Infraestructure.Query;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +11,7 @@ namespace FeiraPreta.Features.Person
 {
     public class List
     {
-        public class Query : PageQuery<IList<Result>>
+        public class Query : IRequest<IList<Result>>
         {
             public int Page { get; set; }
 
@@ -54,7 +54,7 @@ namespace FeiraPreta.Features.Person
             {
                 return await db.Person
                                .Where(p => !p.DeletedDate.HasValue)
-                               .Paginate(message)
+                            //    .Paginate(message)
                                .Select(p => new Result
                                {
                                    Id = p.Id,

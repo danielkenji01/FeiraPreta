@@ -48,6 +48,7 @@ namespace FeiraPreta.Features.Person
                     if (exists.DeletedDate.HasValue)
                     {
                         exists.DeletedDate = null;
+                        exists.PhoneNumber = message.PhoneNumber;
                         db.Person.Update(exists);
                         db.SaveChanges();
                         return new Result { Message = "Empreendedor cadastrado com sucesso", StatusCode = 201 };

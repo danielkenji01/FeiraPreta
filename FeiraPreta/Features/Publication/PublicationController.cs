@@ -37,7 +37,7 @@ namespace FeiraPreta.Features.Publication
         {
             return await mediator.Send(new List.Query());
         }
-
+        
         [HttpGet]
         [Route("all")]
         public async Task<IList<ListAll.Result>> ListAll()
@@ -55,6 +55,13 @@ namespace FeiraPreta.Features.Publication
         [HttpGet]
         [Route("{id}")]
         public async Task<Read.Result> Read(Read.Query query)
+        {
+            return await mediator.Send(query);
+        }
+
+        [HttpGet]
+        [Route("page/{pages}")]
+        public async Task<IList<Paginate.Result>> Paginate(Paginate.Query query)
         {
             return await mediator.Send(query);
         }
