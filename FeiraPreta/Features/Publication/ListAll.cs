@@ -44,6 +44,12 @@ namespace FeiraPreta.Features.Publication
                 public string UsernameInstagram { get; set; }
 
                 public string FullNameInstagram { get; set; }
+
+                public string ProfilePictureInstagram { get; set; }
+
+                public DateTime CreatedDate { get; set; }
+
+                public string PhoneNumber { get; set; }
             }
 
         }
@@ -74,8 +80,11 @@ namespace FeiraPreta.Features.Publication
                                    Person = new Result.PersonResult
                                    {
                                        Id = p.Person.Id,
-                                       FullNameInstagram = p.Person.FullNameInstagram,
-                                       UsernameInstagram = p.Person.UsernameInstagram
+                                        CreatedDate = p.Person.CreatedDate,
+                                        FullNameInstagram = p.Person.FullNameInstagram,
+                                        PhoneNumber = p.Person.PhoneNumber,
+                                        ProfilePictureInstagram = p.Person.ProfilePictureInstagram,
+                                        UsernameInstagram = p.Person.UsernameInstagram
                                    }
                                }).ToListAsync();
             }

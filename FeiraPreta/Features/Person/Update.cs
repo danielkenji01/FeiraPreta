@@ -18,7 +18,7 @@ namespace FeiraPreta.Features.Person
 
             public string PhoneNumber { get; set; }
 
-            public string Username { get; set; }
+            public string UsernameInstagram { get; set; }
         }
 
         public class Result
@@ -39,15 +39,25 @@ namespace FeiraPreta.Features.Person
 
             public async Task<Result> Handle(Command message)
             {
+                Result rs;
                 var person = await db.Person.SingleOrDefaultAsync(p => p.Id == message.Id);
+                var personUser = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == message.UsernameInstagram);
 
-                if (person == null || person.DeletedDate.HasValue) return new Result { Message = "Empreendedor não existente", StatusCode = 404 };
-
-                if (message.PhoneNumber != null) person.PhoneNumber = message.PhoneNumber;
-
-                if (message.Username != null)
+                if (personUser != null) 
                 {
-                    string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
+                    return new Result { Message = "UserNameInstagram já cadastrado", StatusCode = 409 };
+                }
+                else if (person == null || person.DeletedDate.HasValue)
+                {
+                     return new Result { Message = "Empreendedor não existente", StatusCode = 404 };                    
+                }
+                else if (message.PhoneNumber != null)
+                {
+                    person.PhoneNumber = message.PhoneNumber;
+                }
+                else if (message.UsernameInstagram != null)
+                {
+                    string url = "https://api.instagram.com/v1/users/search?q=" + message.UsernameInstagram + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
                     WebResponse response = processWebRequest(url);
 
@@ -65,18 +75,21 @@ namespace FeiraPreta.Features.Person
                             CreatedDate = DateTime.Now,
                             IdInstagram = json["data"][0]["id"].ToString()
                         };
+                        db.Person.Update(person);
+                        await db.SaveChangesAsync();
                     }
+                }
+                else
+                {
+                    person.UpdatedDate = DateTime.Now;
+                
+                    db.Person.Update(person);
 
                     await db.SaveChangesAsync();
+
+                    return new Result { StatusCode = 200, Message = "Empreendedor atualizado com sucesso" };
                 }
-
-                person.UpdatedDate = DateTime.Now;
-                
-                db.Person.Update(person);
-
-                await db.SaveChangesAsync();
-
-                return new Result { StatusCode = 200, Message = "Empreendedor atualizado com sucesso" };
+                return null;
             }
 
             private WebResponse processWebRequest(string url)

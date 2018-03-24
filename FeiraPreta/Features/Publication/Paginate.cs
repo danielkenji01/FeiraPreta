@@ -35,19 +35,21 @@ namespace FeiraPreta.Features.Publication
 
             public bool IsHighlight { get; set; }
 
-            public Person PublicationPerson { get; set; }
+            public PersonResult Person { get; set; }
 
-            public class Person
+            public class PersonResult
             {
                 public Guid Id { get; set; }
 
-                public string Username { get; set; }
+                public string UsernameInstagram { get; set; }
 
-                public string FullName { get; set; }
+                public string FullNameInstagram { get; set; }
 
-                public string Telefone { get; set; }
+                public string ProfilePictureInstagram { get; set; }
 
-                public string ProfilePicture { get; set; }
+                public DateTime CreatedDate { get; set; }
+
+                public string PhoneNumber { get; set; }
             }
             public class TotalPages
             {
@@ -88,16 +90,16 @@ namespace FeiraPreta.Features.Publication
                                 IsHighlight = p.IsHighlight,
                                 Link = p.Link,
                                 Subtitle = p.Subtitle,
-                                PublicationPerson = new Result.Person
+                                Person = new Result.PersonResult
                                 {
                                     Id = p.Person.Id,
-                                    FullName = p.Person.FullNameInstagram,
-                                    ProfilePicture = p.Person.ProfilePictureInstagram,
-                                    Telefone = p.Person.PhoneNumber,
-                                    Username = p.Person.UsernameInstagram
+                                    CreatedDate = p.Person.CreatedDate,
+                                    FullNameInstagram = p.Person.FullNameInstagram,
+                                    PhoneNumber = p.Person.PhoneNumber,
+                                    ProfilePictureInstagram = p.Person.ProfilePictureInstagram,
+                                    UsernameInstagram = p.Person.UsernameInstagram
                                 }
                             }).ToListAsync();
-                
             }
         }
     }
