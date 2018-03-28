@@ -9,7 +9,7 @@ namespace FeiraPreta.Domain
     {
         public Guid Id { get; set; }
 
-        public string Value { get; set; }
+        public float Value { get; set; }
 
         public DateTime CreatedDate { get; set; }
     }

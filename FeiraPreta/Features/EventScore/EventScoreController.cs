@@ -19,5 +19,10 @@ namespace FeiraPreta.Features.EventScore
             this.mediator = mediator;
         }
 
+        [HttpPost]
+        public async Task<Vote.Result> Vote([FromBody] Vote.Command command)
+        {
+            return await mediator.Send(command);
+        }
     }
 }
