@@ -35,19 +35,21 @@ namespace FeiraPreta.Features.Publication
 
             public bool IsHighlight { get; set; }
 
-            public Person PublicationPerson { get; set; }
+            public PersonResult Person { get; set; }
 
-            public class Person
+            public class PersonResult
             {
                 public Guid Id { get; set; }
 
-                public string Username { get; set; }
+                public string UsernameInstagram { get; set; }
 
-                public string FullName { get; set; }
+                public string FullNameInstagram { get; set; }
 
-                public string Telefone { get; set; }
+                public string ProfilePictureInstagram { get; set; }
 
-                public string ProfilePicture { get; set; }
+                public DateTime CreatedDate { get; set; }
+
+                public string PhoneNumber { get; set; }
             }
         }
 
@@ -82,13 +84,14 @@ namespace FeiraPreta.Features.Publication
                     IsHighlight = publication.IsHighlight,
                     Link = publication.Link,
                     Subtitle = publication.Subtitle,
-                    PublicationPerson = new Result.Person
+                    Person = new Result.PersonResult
                     {
                         Id = publication.Person.Id,
-                        FullName = publication.Person.FullNameInstagram,
-                        ProfilePicture = publication.Person.ProfilePictureInstagram,
-                        Telefone = publication.Person.PhoneNumber,
-                        Username = publication.Person.UsernameInstagram
+                        CreatedDate = publication.Person.CreatedDate,
+                        FullNameInstagram = publication.Person.FullNameInstagram,
+                        PhoneNumber = publication.Person.PhoneNumber,
+                        ProfilePictureInstagram = publication.Person.ProfilePictureInstagram,
+                        UsernameInstagram = publication.Person.UsernameInstagram
                     }
                 };
             }

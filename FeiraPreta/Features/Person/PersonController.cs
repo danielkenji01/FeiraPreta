@@ -33,11 +33,8 @@ namespace FeiraPreta.Features.Person
         }
 
         [HttpPut]
-        [Route("{id}")]
-        public async Task<Update.Result> Update(Guid id, [FromBody] Update.Command command)
+        public async Task<Update.Result> Update([FromBody] Update.Command command)
         {
-            command.Id = id;
-
             return await mediator.Send(command);
         }
 

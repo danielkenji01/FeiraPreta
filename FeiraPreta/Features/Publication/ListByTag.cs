@@ -45,9 +45,9 @@ namespace FeiraPreta.Features.Publication
 
                 public bool IsHighlight { get; set; }
 
-                public Person PersonResult { get; set; }
+                public PersonResult Person { get; set; }
 
-                public class Person
+                public class PersonResult
                 {
                     public Guid Id { get; set; }
 
@@ -91,7 +91,7 @@ namespace FeiraPreta.Features.Publication
                         IsHighlight = pub.Publication.IsHighlight,
                         Link = pub.Publication.Link,
                         Subtitle = pub.Publication.Subtitle,
-                        PersonResult = new Result.Person
+                        Person = new Result.PersonResult
                         {
                             Id = pub.Publication.Person.Id,
                             CreatedDate = pub.Publication.Person.CreatedDate,

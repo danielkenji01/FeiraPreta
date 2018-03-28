@@ -39,6 +39,7 @@ namespace FeiraPreta.Features.Tag
                 }
                 
                 db.Tag.Add(tag);
+                db.SaveChanges();
 
                 var publication_tag = new Domain.Publication_Tag
                 {
@@ -47,6 +48,7 @@ namespace FeiraPreta.Features.Tag
                 };
 
                 db.Publication_Tag.Add(publication_tag);
+                db.SaveChanges();
             }
         }
     }
