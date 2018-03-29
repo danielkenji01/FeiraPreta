@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FeiraPreta.Infraestructure;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,7 +38,7 @@ namespace FeiraPreta
             services.AddMvc(opt =>
             {
                 opt.Filters.Add(typeof(ValidationActionFilter));
-            })
+            })      .AddFluentValidation(f => f.RegisterValidatorsFromAssemblyContaining<Startup>())
                     .AddFeatureFolders()
                     .AddJsonOptions(options =>
                     {
