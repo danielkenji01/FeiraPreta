@@ -1,4 +1,5 @@
 ﻿using FeiraPreta.Infraestructure;
+using FluentValidation;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,15 @@ namespace FeiraPreta.Features.EventScore
             public int StatusCode { get; set; }
 
             public string Message { get; set; }
+        }
+
+        public class Validator : AbstractValidator<Command>
+        {
+            public Validator()
+            {
+                RuleFor(v => v.Value).NotNull().WithMessage("Voto não pode ser nulo")
+                                     .NotEmpty().WithMessage("Voto não pode ser nulo");
+            }
         }
 
         public class Handler : IAsyncRequestHandler<Command, Result>

@@ -24,5 +24,19 @@ namespace FeiraPreta.Features.EventScore
         {
             return await mediator.Send(command);
         }
+
+        [HttpGet]
+        [Route("average")]
+        public async Task<Average.Result> Average()
+        {
+            return await mediator.Send(new Average.Query());
+        }
+
+        [HttpGet]
+        [Route("allData")]
+        public async Task<AllData.Result> AllData()
+        {
+            return await mediator.Send(new AllData.Query());
+        }
     }
 }
