@@ -37,9 +37,9 @@ namespace FeiraPreta.Features.Person
 
             public async Task<Result> Handle(Command message)
             {
-                if (message.Username == null || message.Username.Trim() == "") return new Result { Message = "Username não pode ser nulo", StatusCode = 400 };
+                if (message.Username == null || message.Username.Trim() == "") throw new HttpException(400, "Username não pode ser nulo");
 
-                if (message.PhoneNumber == null || message.PhoneNumber.Trim() == "") return new Result { Message = "Telefone não pode ser nulo", StatusCode = 400 };
+                if (message.PhoneNumber == null || message.PhoneNumber.Trim() == "") throw new HttpException(400, "Telefone não pode ser nulo");
 
                 var exists = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == message.Username);
 
