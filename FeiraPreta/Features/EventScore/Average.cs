@@ -19,7 +19,7 @@ namespace FeiraPreta.Features.EventScore
 
         public class Result
         {
-            public float Value { get; set; }
+            public float Average { get; set; }
         }
 
         public class Handler : IAsyncRequestHandler<Query, Result>
@@ -33,13 +33,13 @@ namespace FeiraPreta.Features.EventScore
 
             public async Task<Result> Handle(Query message)
             {
-                if (db.EventScore.Count() == 0) return new Result { Value = 0 }; 
+                if (db.EventScore.Count() == 0) return new Result { Average = 0 }; 
 
                 var result = db.EventScore.Average(e => e.Value);
 
                 return new Result
                 {
-                    Value = (float) Math.Round(result, 0)
+                    Average = (float) Math.Ceiling(result)
                 };
             }
         }
