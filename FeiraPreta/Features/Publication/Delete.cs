@@ -10,19 +10,12 @@ namespace FeiraPreta.Features.Publication
 {
     public class Delete
     {
-        public class Command : IRequest<Result>
+        public class Command : IRequest
         {
             public Guid Id { get; set; }
         }
 
-        public class Result
-        {
-            public int StatusCode { get; set; }
-
-            public string Message { get; set; }
-        }
-
-        public class Handler : IAsyncRequestHandler<Command, Result>
+        public class Handler : IAsyncRequestHandler<Command>
         {
             private readonly Db db;
 
@@ -31,17 +24,15 @@ namespace FeiraPreta.Features.Publication
                 this.db = db;
             }
 
-            public async Task<Result> Handle(Command message)
+            public async Task Handle(Command message)
             {
                 var publication = await db.Publication.SingleOrDefaultAsync(p => p.Id == message.Id);
 
-                if (publication == null || publication.DeletedDate.HasValue) return new Result { Message = "Publicação não existe", StatusCode = 404 };
+                if (publication == null || publication.DeletedDate.HasValue) throw new HttpException(404, "Publicação não existe");
 
                 publication.DeletedDate = DateTime.Now;
 
                 await db.SaveChangesAsync();
-
-                return new Result { StatusCode = 200, Message = "Publicação deletada com sucesso" };
             }
         }
     }

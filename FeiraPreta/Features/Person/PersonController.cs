@@ -20,16 +20,20 @@ namespace FeiraPreta.Features.Person
         }
 
         [HttpPost]
-        public async Task<Create.Result> Create([FromBody] Create.Command command)
+        public async Task<IActionResult> Create([FromBody] Create.Command command)
         {
-            return await mediator.Send(command);
+            await mediator.Send(command);
+
+            return Ok();
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<Delete.Result> Delete(Delete.Command command)
+        public async Task<IActionResult> Delete(Delete.Command command)
         {
-            return await mediator.Send(command);
+            await mediator.Send(command);
+
+            return Ok();
         }
 
         [HttpPut]

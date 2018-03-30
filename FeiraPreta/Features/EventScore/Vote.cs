@@ -10,16 +10,9 @@ namespace FeiraPreta.Features.EventScore
 {
     public class Vote
     {
-        public class Command : IRequest<Result>
+        public class Command : IRequest
         {
             public double Value { get; set; }
-        }
-
-        public class Result
-        {
-            public int StatusCode { get; set; }
-
-            public string Message { get; set; }
         }
 
         public class Validator : AbstractValidator<Command>
@@ -31,7 +24,7 @@ namespace FeiraPreta.Features.EventScore
             }
         }
 
-        public class Handler : IAsyncRequestHandler<Command, Result>
+        public class Handler : IAsyncRequestHandler<Command>
         {
             private readonly Db db;
 
@@ -40,9 +33,9 @@ namespace FeiraPreta.Features.EventScore
                 this.db = db;
             }
 
-            public async Task<Result> Handle(Command message)
+            public async Task Handle(Command message)
             {
-                if (message.Value < 0 || message.Value > 5) return new Result { Message = "Voto inválido", StatusCode = 400 };
+                if (message.Value < 0 || message.Value > 5) throw new HttpException(400, "Voto inválido");
 
                 var eventScore = new Domain.EventScore
                 {
@@ -53,8 +46,6 @@ namespace FeiraPreta.Features.EventScore
                 db.EventScore.Add(eventScore);
 
                 await db.SaveChangesAsync();
-
-                return new Result { Message = "Voto concluído com sucesso", StatusCode = 201 };
             }
         }
     }

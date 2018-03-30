@@ -10,19 +10,12 @@ namespace FeiraPreta.Features.Person
 {
     public class Delete
     {
-        public class Command : IRequest<Result>
+        public class Command : IRequest
         {
             public Guid Id { get; set; }
         }
 
-        public class Result
-        {
-            public int StatusCode { get; set; }
-
-            public string Message { get; set; }
-        }
-
-        public class Handler : IAsyncRequestHandler<Command, Result>
+        public class Handler : IAsyncRequestHandler<Command>
         {
             private readonly Db db;
 
@@ -31,17 +24,15 @@ namespace FeiraPreta.Features.Person
                 this.db = db;
             }
 
-            public async Task<Result> Handle(Command message)
+            public async Task Handle(Command message)
             {
                 var person = await db.Person.SingleOrDefaultAsync(p => p.Id == message.Id);
 
-                if (person == null || person.DeletedDate.HasValue) return new Result { Message = "Empreendedor não existente", StatusCode = 404};
+                if (person == null || person.DeletedDate.HasValue) throw new HttpException(404, "Empreendedor não existe");
 
                 person.DeletedDate = DateTime.Now;
 
                 await db.SaveChangesAsync();
-
-                return new Result { StatusCode = 200, Message = "Empreendedor deletado com sucesso" };
             }
         }
     }

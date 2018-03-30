@@ -20,9 +20,11 @@ namespace FeiraPreta.Features.EventScore
         }
 
         [HttpPost]
-        public async Task<Vote.Result> Vote([FromBody] Vote.Command command)
+        public async Task<IActionResult> Vote([FromBody] Vote.Command command)
         {
-            return await mediator.Send(command);
+            await mediator.Send(command);
+
+            return Ok();
         }
 
         [HttpGet]

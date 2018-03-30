@@ -12,21 +12,14 @@ namespace FeiraPreta.Features.Person
 {
     public class Create
     {
-        public class Command : IRequest<Result>
+        public class Command : IRequest
         {
             public string Username { get; set; }
 
             public string PhoneNumber { get; set; }
         }
 
-        public class Result
-        {
-            public int StatusCode { get; set; }
-
-            public string Message { get; set; }
-        }
-
-        public class CommandHandler : IAsyncRequestHandler<Command, Result>
+        public class CommandHandler : IAsyncRequestHandler<Command>
         {
             private readonly Db db;
 
@@ -35,7 +28,7 @@ namespace FeiraPreta.Features.Person
                 this.db = db;
             }
 
-            public async Task<Result> Handle(Command message)
+            public async Task Handle(Command message)
             {
                 if (message.Username == null || message.Username.Trim() == "") throw new HttpException(400, "Username não pode ser nulo");
 
@@ -50,11 +43,10 @@ namespace FeiraPreta.Features.Person
                         exists.DeletedDate = null;
                         exists.PhoneNumber = message.PhoneNumber;
                         db.Person.Update(exists);
-                        db.SaveChanges();
-                        return new Result { Message = "Empreendedor cadastrado com sucesso", StatusCode = 201 };
+                        await db.SaveChangesAsync();
                     }
 
-                    return new Result { Message = "Empreendedor já existente", StatusCode = 409 };
+                    throw new HttpException(409, "Empreendedor já existe");
                 }
                 else
                 {
@@ -68,7 +60,7 @@ namespace FeiraPreta.Features.Person
                     {
                         var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                        if (json["data"].Count() == 0) return new Result { StatusCode = 404, Message = "Perfil não encontrado" };
+                        if (json["data"].Count() == 0) throw new HttpException(400, "Perfil não encontrado");
 
                         person = new Domain.Person
                         {
@@ -83,10 +75,7 @@ namespace FeiraPreta.Features.Person
                         db.Person.Add(person);
                     }
 
-                    await db.SaveChangesAsync();
-
-                    return new Result { Message = "Empreendedor cadastrado com sucesso", StatusCode = 201 };
-                }
+                    await db.SaveChangesAsync();                }
 
 
             }
