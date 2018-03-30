@@ -19,7 +19,7 @@ namespace FeiraPreta.Features.EventScore
 
         public class Result
         {
-            public float Average { get; set; }
+            public double Average { get; set; }
         }
 
         public class Handler : IAsyncRequestHandler<Query, Result>
@@ -39,7 +39,7 @@ namespace FeiraPreta.Features.EventScore
 
                 return new Result
                 {
-                    Average = (float) Math.Ceiling(result)
+                    Average = Math.Ceiling(result)
                 };
             }
         }

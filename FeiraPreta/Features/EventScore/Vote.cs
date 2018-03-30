@@ -12,7 +12,7 @@ namespace FeiraPreta.Features.EventScore
     {
         public class Command : IRequest<Result>
         {
-            public float Value { get; set; }
+            public double Value { get; set; }
         }
 
         public class Result
