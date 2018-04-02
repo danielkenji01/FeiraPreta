@@ -43,7 +43,6 @@ namespace FeiraPreta.Features.Publication
                     {
                         exists.DeletedDate = null;
                     }
-
                     throw new HttpException(409, "Publicação já existente");
                 }
 

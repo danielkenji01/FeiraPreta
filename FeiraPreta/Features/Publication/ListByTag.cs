@@ -10,22 +10,25 @@ namespace FeiraPreta.Features.Publication
 {
     public class ListByTag
     {
-        public class Query : IRequest<IList<Result>>
+        public class Query : IRequest<IList<Publicacao>>
         {
             public string Tag { get; set; }
+
+            public int Page { get; set; }
 
             public Query()
             {
 
             }
 
-            public Query(string Tag)
+            public Query(string Tag, int Page)
             {
                 this.Tag = Tag;
+                this.Page = Page;
             }
         }
 
-        public class Result
+        public class Publicacao
         {
                 public Guid Id { get; set; }
 
@@ -64,7 +67,7 @@ namespace FeiraPreta.Features.Publication
             
         }
 
-        public class QueryHandler : IAsyncRequestHandler<Query, IList<Result>>
+        public class QueryHandler : IAsyncRequestHandler<Query, IList<Publicacao>>
         {
             private readonly Db db;
 
@@ -73,14 +76,20 @@ namespace FeiraPreta.Features.Publication
                 this.db = db;
             }
 
-            public async Task<IList<Result>> Handle(Query message)
+            public async Task<IList<Publicacao>> Handle(Query message)
             {
+                int start = 0;
+                
+                start = ((message.Page-1)*18);
+
                 return await db.Publication
                     .Include(p => p.Person)
                     .Include(p => p.Publication_Tags)
                     .ThenInclude(pt => pt.Tag)
                     .Where(p => !p.DeletedDate.HasValue || !p.Person.DeletedDate.HasValue)
-                    .SelectMany(p => p.Publication_Tags.Where(pt => pt.Tag.Nome == message.Tag).Select(pub => new Result
+                    .Skip(start)
+                    .Take(18)
+                    .SelectMany(p => p.Publication_Tags.Where(pt => pt.Tag.Nome == message.Tag).Select(pub => new Publicacao
                     {
                         Id = pub.Publication.Id,
                         CreatedDate = pub.Publication.CreatedDate,
@@ -91,7 +100,7 @@ namespace FeiraPreta.Features.Publication
                         IsHighlight = pub.Publication.IsHighlight,
                         Link = pub.Publication.Link,
                         Subtitle = pub.Publication.Subtitle,
-                        Person = new Result.PersonResult
+                        Person = new Publicacao.PersonResult
                         {
                             Id = pub.Publication.Person.Id,
                             CreatedDate = pub.Publication.Person.CreatedDate,
