@@ -39,61 +39,64 @@ namespace FeiraPreta.Features.Publication
                     if (exists.DeletedDate.HasValue)
                     {
                         exists.DeletedDate = null;
+                        exists.IsHighlight = false;
                     }
-
-                    throw new HttpException(409, "Link já existente");
+                    else throw new HttpException(409, "Link já existente");
                 }
-
-                int firstIndex = message.Link.IndexOf("p/");
-                int lastIndex = message.Link.LastIndexOf("?");
-
-                string shortcode = message.Link.Substring(firstIndex + 2, lastIndex - firstIndex - 3);
-
-                string url = "https://api.instagram.com/v1/media/shortcode/" + shortcode + "?access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
-
-                WebResponse response = processWebRequest(url);
-
-                Domain.Publication publication = new Domain.Publication();
-
-                using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
+                else
                 {
-                    var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                    if (json["data"] == null) throw new HttpException(404, "Link inválido");
+                    int firstIndex = message.Link.IndexOf("p/");
+                    int lastIndex = message.Link.LastIndexOf("?");
 
-                    var person = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"]["user"]["username"].ToString());
+                    string shortcode = message.Link.Substring(firstIndex + 2, lastIndex - firstIndex - 3);
 
-                    if (person == null) throw new HttpException(400, "Empreendedor não está cadastrado");
+                    string url = "https://api.instagram.com/v1/media/shortcode/" + shortcode + "?access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
-                    publication = new Domain.Publication
+                    WebResponse response = processWebRequest(url);
+
+                    Domain.Publication publication = new Domain.Publication();
+
+                    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
                     {
-                        ImageLowResolution = json["data"]["images"]["low_resolution"]["url"].ToString(),
-                        ImageStandardResolution = json["data"]["images"]["standard_resolution"]["url"].ToString(),
-                        ImageThumbnail = json["data"]["images"]["thumbnail"]["url"].ToString(),
-                        PersonId = person.Id,
-                        CreatedDate = DateTime.Now,
-                        IsHighlight = false,
-                        CreatedDateInstagram = DateTime.Now,
-                        Subtitle = json["data"]["caption"]["text"].ToString(),
-                        Link = message.Link
-                    };
+                        var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                    db.Publication.Add(publication);
+                        if (json["data"] == null) throw new HttpException(404, "Link inválido");
 
-                    var tags = json["data"]["tags"];
+                        var person = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"]["user"]["username"].ToString());
 
-                    foreach (var t in tags)
-                    {
-                        var command = new Tag.Create.Command
+                        if (person == null) throw new HttpException(400, "Empreendedor não está cadastrado");
+
+                        publication = new Domain.Publication
                         {
-                            Nome = t.ToString(),
-                            PublicationId = publication.Id
+                            ImageLowResolution = json["data"]["images"]["low_resolution"]["url"].ToString(),
+                            ImageStandardResolution = json["data"]["images"]["standard_resolution"]["url"].ToString(),
+                            ImageThumbnail = json["data"]["images"]["thumbnail"]["url"].ToString(),
+                            PersonId = person.Id,
+                            CreatedDate = DateTime.Now,
+                            IsHighlight = false,
+                            CreatedDateInstagram = DateTime.Now,
+                            Subtitle = json["data"]["caption"]["text"].ToString(),
+                            Link = message.Link
                         };
 
-                        await mediator.Send(command);
-                    }
+                        db.Publication.Add(publication);
 
-                };
+                        var tags = json["data"]["tags"];
+
+                        foreach (var t in tags)
+                        {
+                            var command = new Tag.Create.Command
+                            {
+                                Nome = t.ToString(),
+                                PublicationId = publication.Id
+                            };
+
+                            await mediator.Send(command);
+                        }
+
+                    };
+                }
 
                 await db.SaveChangesAsync();
             }
