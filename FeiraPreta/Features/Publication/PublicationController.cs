@@ -20,16 +20,20 @@ namespace FeiraPreta.Features.Publication
         }
 
         [HttpPost]
-        public async Task<Create.Result> Create([FromBody] Create.Command command)
+        public async Task<IActionResult> Create([FromBody] Create.Command command)
         {
-            return await mediator.Send(command);
+            await mediator.Send(command);
+
+            return Ok();
         }
 
         [HttpPost]
         [Route("highlight")]
-        public async Task<Highlight.Result> Highlight([FromBody] Highlight.Command command)
+        public async Task<IActionResult> Highlight([FromBody] Highlight.Command command)
         {
-            return await mediator.Send(command);
+            await mediator.Send(command);
+
+            return Ok();
         }
 
         [HttpGet]
@@ -47,9 +51,11 @@ namespace FeiraPreta.Features.Publication
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<Delete.Result> Delete(Delete.Command command)
+        public async Task<IActionResult> Delete(Delete.Command command)
         {
-            return await mediator.Send(command);
+            await mediator.Send(command);
+
+            return Ok();
         }
 
         [HttpGet]
