@@ -73,10 +73,16 @@ namespace FeiraPreta.Features.Publication
         }
 
         [HttpGet]
-        [Route("search/{search}")]
-        public async Task<IList<ListByTag.Result>> ListByTag(string search)
+        [Route("search/{search}/{page}")]
+        public  IActionResult ListByTag(string search, int page)
         {
-            return await mediator.Send(new ListByTag.Query(search));
+            var publication = mediator.Send(new ListByTag.Query(search, page));
+            return Ok(new {
+                Page = new {
+                    total_pages = (publication.Result.Count/18)+1
+                },
+                Publicacao = publication
+            });
         }
     }
 }

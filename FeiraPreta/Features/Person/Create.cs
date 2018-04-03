@@ -38,15 +38,19 @@ namespace FeiraPreta.Features.Person
 
                 if (exists != null)
                 {
-                    if (exists.DeletedDate.HasValue)
+                    if (exists.DeletedDate != null)
                     {
                         exists.DeletedDate = null;
                         exists.PhoneNumber = message.PhoneNumber;
                         db.Person.Update(exists);
                         await db.SaveChangesAsync();
                     }
+                    else
+                    {
+                        throw new HttpException(409, "Empreendedor já existe");
+                    }
 
-                    throw new HttpException(409, "Empreendedor já existe");
+                    
                 }
                 else
                 {
