@@ -34,7 +34,7 @@ namespace FeiraPreta.Features.Person
             {
                 if (message.PhoneNumber == null && message.Username == null) throw new HttpException(400, "Preencha pelo menos um dos campos");
 
-                var person = await db.Person.SingleOrDefaultAsync(p => p.Id == message.Id);
+                var person = await db.Person.Where(p => !p.DeletedDate.HasValue).SingleOrDefaultAsync(p => p.Id == message.Id);
 
                 if (person == null) throw new HttpException(404, "Usuário não existe");
 
