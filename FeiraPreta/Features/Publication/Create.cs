@@ -47,9 +47,9 @@ namespace FeiraPreta.Features.Publication
                 {
 
                     int firstIndex = message.Link.IndexOf("p/");
-                    int lastIndex = message.Link.LastIndexOf("?");
+                    int lastIndex = message.Link.LastIndexOf("/");
 
-                    string shortcode = message.Link.Substring(firstIndex + 2, lastIndex - firstIndex - 3);
+                    string shortcode = message.Link.Substring(firstIndex + 2, lastIndex - firstIndex - 2);
 
                     string url = "https://api.instagram.com/v1/media/shortcode/" + shortcode + "?access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 

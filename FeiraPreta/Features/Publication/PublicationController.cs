@@ -84,5 +84,14 @@ namespace FeiraPreta.Features.Publication
                 Publicacao = publication
             });
         }
+
+        [HttpPost]
+        [Route("automatic")]
+        public async Task<IActionResult> Automatic()
+        {
+            await mediator.Send(new AutomaticSearch.Command());
+
+            return Ok();
+        }
     }
 }
