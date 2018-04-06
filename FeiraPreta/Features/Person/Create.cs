@@ -36,52 +36,68 @@ namespace FeiraPreta.Features.Person
 
                 var exists = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == message.Username);
 
-                if (exists != null)
+                if (exists != null && exists.DeletedDate.HasValue)
                 {
-                    if (exists.DeletedDate != null)
-                    {
-                        exists.DeletedDate = null;
-                        exists.PhoneNumber = message.PhoneNumber;
-                        db.Person.Update(exists);
-                        await db.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        throw new HttpException(409, "Empreendedor já existe");
-                    }
-
-                    
+                    exists.DeletedDate = null;
                 }
-                else
+                else if (exists != null && !exists.DeletedDate.HasValue) throw new HttpException(409, "Usuário já existe");
+
+                Domain.Person person = new Domain.Person
                 {
-                    string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
+                    CreatedDate = DateTime.Now,
+                    FullNameInstagram = message.Username,
+                    IdInstagram = "aleatorio",
+                    PhoneNumber = message.PhoneNumber,
+                    ProfilePictureInstagram = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyjDnr_pnymo0iZK2RWYbXn1kYa0F3N6YS5avCixuX3RQcM2Zy",
+                    UsernameInstagram = message.Username
+                };
 
-                    WebResponse response = processWebRequest(url);
+                db.Person.Add(person);
 
-                    Domain.Person person = new Domain.Person();
+                await db.SaveChangesAsync();
 
-                    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
-                    {
-                        var json = JObject.Parse(await sr.ReadToEndAsync());
+                //if (exists != null)
+                //{
+                //    if (exists.DeletedDate != null)
+                //    {
+                //        exists.DeletedDate = null;
+                //        exists.PhoneNumber = message.PhoneNumber;
+                //        db.Person.Update(exists);
+                //        await db.SaveChangesAsync();
+                //    }
+                //    else
+                //    {
+                //        throw new HttpException(409, "Empreendedor já existe");
+                //    }
+                //}
+                //else
+                //{
+                //    string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
-                        if (json["data"].Count() == 0) throw new HttpException(400, "Perfil não encontrado");
+                //    WebResponse response = processWebRequest(url);
 
-                        person = new Domain.Person
-                        {
-                            ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString(),
-                            FullNameInstagram = json["data"][0]["full_name"].ToString(),
-                            UsernameInstagram = json["data"][0]["username"].ToString(),
-                            CreatedDate = DateTime.Now,
-                            PhoneNumber = message.PhoneNumber,
-                            IdInstagram = json["data"][0]["id"].ToString()
-                        };
+                //    Domain.Person person = new Domain.Person();
 
-                        db.Person.Add(person);
-                    }
+                //    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
+                //    {
+                //        var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                    await db.SaveChangesAsync();                }
+                //        if (json["data"].Count() == 0) throw new HttpException(400, "Perfil não encontrado");
 
+                //        person = new Domain.Person
+                //        {
+                //            ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString(),
+                //            FullNameInstagram = json["data"][0]["full_name"].ToString(),
+                //            UsernameInstagram = json["data"][0]["username"].ToString(),
+                //            CreatedDate = DateTime.Now,
+                //            PhoneNumber = message.PhoneNumber,
+                //            IdInstagram = json["data"][0]["id"].ToString()
+                //        };
 
+                //        db.Person.Add(person);
+                //    }
+
+                //}
             }
 
             private WebResponse processWebRequest(string url)

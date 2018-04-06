@@ -45,7 +45,6 @@ namespace FeiraPreta.Features.Publication
                 }
                 else
                 {
-
                     int firstIndex = message.Link.IndexOf("p/");
                     int lastIndex = message.Link.LastIndexOf("/");
 
@@ -94,7 +93,6 @@ namespace FeiraPreta.Features.Publication
 
                             await mediator.Send(command);
                         }
-
                     };
                 }
 

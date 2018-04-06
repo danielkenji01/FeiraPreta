@@ -37,71 +37,75 @@ namespace FeiraPreta.Features.Publication
 
                 var exists = await db.Publication.SingleOrDefaultAsync(p => p.Link == message.Link);
 
-                if (exists != null)
-                {
-                    if (exists.DeletedDate.HasValue)
-                    {
-                        exists.DeletedDate = null;
-                        exists.IsHighlight = true;
-                    }
-                    else throw new HttpException(409, "Publicação já existente");
-                }
-                else
-                {
+                if (exists != null && !exists.IsHighlight && !exists.DeletedDate.HasValue) exists.IsHighlight = true;
 
-                    int firstIndex = message.Link.IndexOf("p/");
-                    int lastIndex = message.Link.LastIndexOf("?");
-
-                    string shortcode = message.Link.Substring(firstIndex + 2, lastIndex - firstIndex - 3);
-
-                    string url = "https://api.instagram.com/v1/media/shortcode/" + shortcode + "?access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
-
-                    WebResponse response = processWebRequest(url);
-
-                    Domain.Publication publication = new Domain.Publication();
-
-                    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
-                    {
-                        var json = JObject.Parse(await sr.ReadToEndAsync());
-
-                        if (json["data"] == null) throw new HttpException(404, "Link inválido");
-
-                        var person = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"]["user"]["username"].ToString());
-
-                        if (person == null) throw new HttpException(400, "O empreendedor não está cadastrado");
-
-                        publication = new Domain.Publication
-                        {
-                            ImageLowResolution = json["data"]["images"]["low_resolution"]["url"].ToString(),
-                            ImageStandardResolution = json["data"]["images"]["standard_resolution"]["url"].ToString(),
-                            ImageThumbnail = json["data"]["images"]["thumbnail"]["url"].ToString(),
-                            PersonId = person.Id,
-                            CreatedDate = DateTime.Now,
-                            IsHighlight = true,
-                            CreatedDateInstagram = DateTime.Now,
-                            Subtitle = json["data"]["caption"]["text"].ToString(),
-                            Link = message.Link
-                        };
-
-                        db.Publication.Add(publication);
-
-                        var tags = json["data"]["tags"];
-
-                        foreach (var t in tags)
-                        {
-                            var command = new Tag.Create.Command
-                            {
-                                Nome = t.ToString(),
-                                PublicationId = publication.Id
-                            };
-
-                            await mediator.Send(command);
-                        }
-
-                    };
-                }
+                else if (exists != null && exists.DeletedDate.HasValue && exists.IsHighlight) exists.DeletedDate = null;
 
                 await db.SaveChangesAsync();
+
+                //if (exists != null)
+                //{
+                //    if (exists.DeletedDate.HasValue)
+                //    {
+                //        exists.DeletedDate = null;
+                //        exists.IsHighlight = true;
+                //    }
+                //    else throw new HttpException(409, "Publicação já existente");
+                //}
+                //else
+                //{
+
+                //    int firstIndex = message.Link.IndexOf("p/");
+                //    int lastIndex = message.Link.LastIndexOf("?");
+
+                //    string shortcode = message.Link.Substring(firstIndex + 2, lastIndex - firstIndex - 3);
+
+                //    string url = "https://api.instagram.com/v1/media/shortcode/" + shortcode + "?access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
+
+                //    WebResponse response = processWebRequest(url);
+
+                //    Domain.Publication publication = new Domain.Publication();
+
+                //    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
+                //    {
+                //        var json = JObject.Parse(await sr.ReadToEndAsync());
+
+                //        if (json["data"] == null) throw new HttpException(404, "Link inválido");
+
+                //        var person = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == json["data"]["user"]["username"].ToString());
+
+                //        if (person == null) throw new HttpException(400, "O empreendedor não está cadastrado");
+
+                //        publication = new Domain.Publication
+                //        {
+                //            ImageLowResolution = json["data"]["images"]["low_resolution"]["url"].ToString(),
+                //            ImageStandardResolution = json["data"]["images"]["standard_resolution"]["url"].ToString(),
+                //            ImageThumbnail = json["data"]["images"]["thumbnail"]["url"].ToString(),
+                //            PersonId = person.Id,
+                //            CreatedDate = DateTime.Now,
+                //            IsHighlight = true,
+                //            CreatedDateInstagram = DateTime.Now,
+                //            Subtitle = json["data"]["caption"]["text"].ToString(),
+                //            Link = message.Link
+                //        };
+
+                //        db.Publication.Add(publication);
+
+                //        var tags = json["data"]["tags"];
+
+                //        foreach (var t in tags)
+                //        {
+                //            var command = new Tag.Create.Command
+                //            {
+                //                Nome = t.ToString(),
+                //                PublicationId = publication.Id
+                //            };
+
+                //            await mediator.Send(command);
+                //        }
+
+                //    };
+                //}
             }
 
             private WebResponse processWebRequest(string url)

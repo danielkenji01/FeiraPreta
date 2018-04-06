@@ -79,7 +79,7 @@ namespace FeiraPreta.Features.Publication
                                    Link = p.Link,
                                    Person = new Result.PersonResult
                                    {
-                                       Id = p.Person.Id,
+                                        Id = p.Person.Id,
                                         CreatedDate = p.Person.CreatedDate,
                                         FullNameInstagram = p.Person.FullNameInstagram,
                                         PhoneNumber = p.Person.PhoneNumber,

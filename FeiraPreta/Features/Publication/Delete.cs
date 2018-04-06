@@ -30,7 +30,9 @@ namespace FeiraPreta.Features.Publication
 
                 if (publication == null || publication.DeletedDate.HasValue) throw new HttpException(404, "Publicação não existe");
 
-                publication.DeletedDate = DateTime.Now;
+                else if (publication.IsHighlight == false) throw new HttpException(409, "Publicação não é destaque");
+
+                publication.IsHighlight = false;
 
                 await db.SaveChangesAsync();
             }

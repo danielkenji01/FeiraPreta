@@ -1,5 +1,6 @@
 ﻿using FeiraPreta.Infraestructure;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -32,44 +33,66 @@ namespace FeiraPreta.Features.Publication
 
             public async Task Handle(Command message)
             {
-                var persons = db.Person.Where(p => !p.DeletedDate.HasValue).ToList();
+                string url = "https://api.instagram.com/v1/tags/feirapreta/media/recent?access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
-                foreach (Domain.Person person in persons) {
+                WebResponse response = processWebRequest(url);
 
-                    string url = "https://api.instagram.com/v1/users/" + person.IdInstagram + "/media/recent/?access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
+                using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
+                {
+                    var json = JObject.Parse(await sr.ReadToEndAsync());
 
-                    WebResponse response = processWebRequest(url);
+                    if (json["data"] == null) throw new HttpException(404, "Sem publicações existentes");
 
-                    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
+                    var medias = json["data"].ToList();
+
+                    foreach (var media in medias)
                     {
-                        var json = JObject.Parse(await sr.ReadToEndAsync());
+                        var listTags = media["tags"].ToList();
 
-                        if (json["data"] == null) throw new HttpException(404, "Sem publicações existentes");
+                        if (listTags.Count == 0) continue;
 
-                        var medias = json["data"].ToList();
+                        var person = await db.Person.SingleOrDefaultAsync(p => p.UsernameInstagram == media["user"]["username"].ToString());
 
-                        foreach (var media in medias)
+                        if (person == null) continue;
+
+                        var tags = new List<String>();
+
+                        foreach (var tag in listTags) tags.Add(tag.ToString());
+
+                        if (await db.Publication.SingleOrDefaultAsync(p => p.Link == media["link"].ToString()) != null) continue;
+
+                        if (tags.Contains("feirapreta") && tags.Contains("produto"))
                         {
-                            var listTags = media["tags"].ToList();
-
-                            if (listTags.Count == 0) continue;
-
-                            var tags = new List<String>();
-
-                            foreach (var tag in listTags) tags.Add(tag.ToString());
-
-                            if (tags.Contains("feirapreta") && tags.Contains("produto"))
+                            Domain.Publication publication = new Domain.Publication
                             {
-                                var command = new Create.Command
+                                ImageLowResolution = media["images"]["low_resolution"]["url"].ToString(),
+                                ImageStandardResolution = media["images"]["standard_resolution"]["url"].ToString(),
+                                ImageThumbnail = media["images"]["thumbnail"]["url"].ToString(),
+                                PersonId = person.Id,
+                                CreatedDate = DateTime.Now,
+                                IsHighlight = false,
+                                CreatedDateInstagram = DateTime.Now,
+                                Subtitle = media["caption"]["text"].ToString(),
+                                Link = media["link"].ToString()
+                            };
+
+                            db.Publication.Add(publication);
+                            
+                            foreach (var t in tags)
+                            {
+                                var command = new Tag.Create.Command
                                 {
-                                    Link = media["link"].ToString()
+                                    Nome = t,
+                                    PublicationId = publication.Id
                                 };
 
                                 await mediator.Send(command);
                             }
+
+                            await db.SaveChangesAsync();
                         }
-                    };
-                }
+                    }
+                };
             }
 
             private WebResponse processWebRequest(string url)
@@ -93,3 +116,4 @@ namespace FeiraPreta.Features.Publication
         }
     }
 }
+

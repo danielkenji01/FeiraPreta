@@ -36,11 +36,10 @@ namespace FeiraPreta.Features.Tag
                     {
                         Nome = message.Nome
                     };
-                }
-                
-                db.Tag.Add(tag);
-                db.SaveChanges();
 
+                    db.Tag.Add(tag);
+                } 
+                
                 var publication_tag = new Domain.Publication_Tag
                 {
                     PublicationId = message.PublicationId,
@@ -48,7 +47,6 @@ namespace FeiraPreta.Features.Tag
                 };
 
                 db.Publication_Tag.Add(publication_tag);
-                db.SaveChanges();
             }
         }
     }
