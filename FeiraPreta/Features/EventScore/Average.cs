@@ -39,7 +39,7 @@ namespace FeiraPreta.Features.EventScore
 
                 return new Result
                 {
-                    Average = Math.Ceiling(result)
+                    Average = Math.Round(result)
                 };
             }
         }
