@@ -40,29 +40,31 @@ namespace FeiraPreta.Features.Person
 
                 if (message.PhoneNumber != null) person.PhoneNumber = message.PhoneNumber;
 
-                if (message.Username != null)
-                {
-                    if (await db.Person.Where(p => !p.DeletedDate.HasValue).SingleOrDefaultAsync(p => p.UsernameInstagram == message.Username) != null) throw new HttpException(409, "Usuário já existe");
+                if (message.Username != null) person.UsernameInstagram = message.Username;
 
-                    string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
+                //if (message.Username != null)
+                //{
+                //    if (await db.Person.Where(p => !p.DeletedDate.HasValue).SingleOrDefaultAsync(p => p.UsernameInstagram == message.Username) != null) throw new HttpException(409, "Usuário já existe");
 
-                    WebResponse response = processWebRequest(url);
+                //    string url = "https://api.instagram.com/v1/users/search?q=" + message.Username + "&access_token=7207542169.480fb87.1cc924b10c4b43a5915543675bd5f736";
 
-                    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
-                    {
-                        var json = JObject.Parse(await sr.ReadToEndAsync());
+                //    WebResponse response = processWebRequest(url);
 
-                        if (json["data"].Count() == 0) throw new HttpException(404, "Usuário não encontrado");
+                //    using (var sr = new System.IO.StreamReader(response.GetResponseStream()))
+                //    {
+                //        var json = JObject.Parse(await sr.ReadToEndAsync());
+
+                //        if (json["data"].Count() == 0) throw new HttpException(404, "Usuário não encontrado");
                         
-                        person.ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString();
-                        person.FullNameInstagram = json["data"][0]["full_name"].ToString();
-                        person.UsernameInstagram = json["data"][0]["username"].ToString();
-                        person.UpdatedDate = DateTime.Now;
-                        person.IdInstagram = json["data"][0]["id"].ToString();
-                    }
+                //        person.ProfilePictureInstagram = json["data"][0]["profile_picture"].ToString();
+                //        person.FullNameInstagram = json["data"][0]["full_name"].ToString();
+                //        person.UsernameInstagram = json["data"][0]["username"].ToString();
+                //        person.UpdatedDate = DateTime.Now;
+                //        person.IdInstagram = json["data"][0]["id"].ToString();
+                //    }
 
-                    if (message.PhoneNumber == null) person.PhoneNumber = "0000-0000";
-                }
+                //    if (message.PhoneNumber == null) person.PhoneNumber = "0000-0000";
+                //}
 
                 await db.SaveChangesAsync();
             }
